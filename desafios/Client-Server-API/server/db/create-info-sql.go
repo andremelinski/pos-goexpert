@@ -5,10 +5,9 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/andremelinski/pos-goexpert/desafios/Client-Server-API/server/api"
-
 	"time"
 
+	"github.com/andremelinski/pos-goexpert/desafios/Client-Server-API/server/api"
 	"github.com/google/uuid"
 )
 
