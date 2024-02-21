@@ -1,0 +1,57 @@
+package main
+
+import (
+	"context"
+	"goexpert/desafios/Client-Server-API/client/document"
+	"io"
+	"net/http"
+	"os"
+	"time"
+)
+
+type UsdbrlBid struct {
+	Code       string `json:"code,omitempty"`
+	Codein     string `json:"codein,omitempty"`
+	Name       string `json:"name,omitempty"`
+	High       string `json:"high,omitempty"`
+	Low        string `json:"low,omitempty"`
+	VarBid     string `json:"varBid,omitempty"`
+	PctChange  string `json:"pctChange,omitempty"`
+	Bid        string `json:"bid,omitempty"`
+	Ask        string `json:"ask,omitempty"`
+	Timestamp  string `json:"timestamp,omitempty"`
+	CreateDate string `json:"create_date,omitempty"`
+}
+
+func main() {
+	ctx, cancel := context.WithTimeout(context.Background(), 300*time.Millisecond)
+	// ao final de tudo, vc fecha a req
+	defer cancel()
+	//  preparando a request com o context. Context -> se a req passar de 5 sec, ela eh cancelada
+	req, err := http.NewRequestWithContext(ctx, "GET", "http://localhost:8080", nil)
+
+	if err != nil {
+		panic(err)
+	}
+
+	res, err := http.DefaultClient.Do(req)
+
+	if err != nil {
+		panic(err)
+	}
+
+	if res.StatusCode == http.StatusOK {
+		bodyBytes, err := io.ReadAll(res.Body)
+		if err != nil {
+			panic(err)
+		}
+		err = document.DocumentInit(string(bodyBytes)).CreateFile()
+			if err != nil {
+			panic(err)
+		}
+	}
+
+	io.Copy(os.Stdout, res.Body)
+
+	defer res.Body.Close()
+}

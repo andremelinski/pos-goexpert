@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Cursos</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Carga Horaria</th>
+            </tr>
+            <tbody>
+                {{range .}}
+                    {{if eq .Nome "go"}}
+                    <p>Go expert</p>
+                    {{end}}
+                <tr>
+                    <td>{{.Nome}}</td>
+                    <td>{{.CargaHoraria}}</td>
+                </tr>
+                {{end}}
+            </tbody>
+        </thead>
+    </table>
+</body>
+</html>

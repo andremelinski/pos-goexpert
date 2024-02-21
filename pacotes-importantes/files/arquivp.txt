@@ -1,0 +1,2 @@
+Hello word
+ escrevendo bytes algumas informacoes, independente da tipagem: 1234, true
