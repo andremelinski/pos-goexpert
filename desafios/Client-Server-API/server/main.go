@@ -3,11 +3,11 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
-	"goexpert/desafios/Client-Server-API/server/api"
-	"goexpert/desafios/Client-Server-API/server/db"
 	"net/http"
 	"time"
 
+	"github.com/andremelinski/pos-goexpert/desafios/Client-Server-API/server/api"
+	"github.com/andremelinski/pos-goexpert/desafios/Client-Server-API/server/db"
 	_ "github.com/go-sql-driver/mysql"
 )
 

@@ -4,7 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"goexpert/desafios/Client-Server-API/server/api"
+
+	"github.com/andremelinski/pos-goexpert/desafios/Client-Server-API/server/api"
+
 	"time"
 
 	"github.com/google/uuid"

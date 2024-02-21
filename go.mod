@@ -1,4 +1,4 @@
-module goexpert
+module github.com/andremelinski/pos-goexpert
 
 go 1.21.1
 
@@ -11,3 +11,4 @@ require (
 	gorm.io/driver/mysql v1.5.4 // indirect
 	gorm.io/gorm v1.25.7 // indirect
 )
+

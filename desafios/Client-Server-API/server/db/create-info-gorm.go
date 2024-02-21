@@ -2,8 +2,8 @@ package db
 
 import (
 	"fmt"
-	"goexpert/desafios/Client-Server-API/server/api"
 
+	"github.com/andremelinski/pos-goexpert/desafios/Client-Server-API/server/api"
 	"gorm.io/gorm"
 )
 

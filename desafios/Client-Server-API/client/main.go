@@ -2,11 +2,12 @@ package main
 
 import (
 	"context"
-	"goexpert/desafios/Client-Server-API/client/document"
 	"io"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/andremelinski/pos-goexpert/desafios/Client-Server-API/client/document"
 )
 
 type UsdbrlBid struct {
