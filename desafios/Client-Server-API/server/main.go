@@ -9,6 +9,7 @@ import (
 	"github.com/andremelinski/pos-goexpert/desafios/Client-Server-API/server/api"
 	"github.com/andremelinski/pos-goexpert/desafios/Client-Server-API/server/db"
 	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 // https://mholt.github.io/json-to-go/
@@ -18,10 +19,9 @@ var dbConfig *sql.DB
 
 func main() {
 
-	// dsn := "root:root@tcp(localhost:3306)/goexpert?charset=utf8mb4&parseTime=True&loc=Local"
-	// config, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	// config, err := gorm.Open(sqlite.Open("sqlite3"), &gorm.Config{})
 
-	config, err := sql.Open("mysql", "root:root@tcp(localhost:3306)/goexpert")
+	config, err := sql.Open("sqlite3", "/bid.db")
 	config.Ping()
 	
 	if err != nil {
@@ -62,5 +62,4 @@ func getPrice( w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w ).Encode(payloadNormalized)
-	return
 }
