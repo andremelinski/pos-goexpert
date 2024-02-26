@@ -4,11 +4,12 @@ import (
 	"database/sql"
 	"encoding/json"
 	"net/http"
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/andremelinski/pos-goexpert/desafios/Client-Server-API/server/api"
 	"github.com/andremelinski/pos-goexpert/desafios/Client-Server-API/server/db"
-	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -21,7 +22,7 @@ func main() {
 
 	// config, err := gorm.Open(sqlite.Open("sqlite3"), &gorm.Config{})
 
-	config, err := sql.Open("sqlite3", "/bid.db")
+	config, err := sql.Open("sqlite3", "./db/bid.db")
 	config.Ping()
 	
 	if err != nil {
@@ -29,6 +30,13 @@ func main() {
 	}
 
 	// config.AutoMigrate(&db.UsdBrlGormModel{})
+	path := filepath.Join("./db/sql","usdBrl.sql")
+	c, _ := os.ReadFile(path)
+	s := string(c)
+	_ , err = config.Exec(s)
+	if err != nil{
+		panic(err)
+	}
 	dbConfig = config
 	
 	http.HandleFunc("/", getPrice)
