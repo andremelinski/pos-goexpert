@@ -21,7 +21,7 @@ func main() {
 
 	// config, err := gorm.Open(sqlite.Open("sqlite3"), &gorm.Config{})
 
-	config, err := sql.Open("sqlite3", "/bid.db")
+	config, err := sql.Open("mysql", "root:root@tcp(localhost:3306)/goexpert")
 	config.Ping()
 	
 	if err != nil {
