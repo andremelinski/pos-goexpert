@@ -18,6 +18,14 @@ O client.go terá que salvar a cotação atual em um arquivo "cotacao.txt" no fo
  
 O endpoint necessário gerado pelo server.go para este desafio será: /cotacao e a porta a ser utilizada pelo servidor HTTP será a 8080.
 
+- How to run this application?
+    * in sever file run: go run main.go atention: if you're using windows make sure that you use MinGW command prompt to run this command  
+    * in client file run: go run main.go
+
+- What it's expected? 
+    * A big.db file should be created after server initialization
+    * After starting the client, the Server.txt txt file must be written with the server object response
+
 - windows: 
     - https://www.mingw-w64.org/
     - https://medium.com/@yaravind/go-sqlite-on-windows-f91ef2dacfe
