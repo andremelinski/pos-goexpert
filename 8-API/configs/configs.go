@@ -5,8 +5,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-var cfg *conf
-
+// conf nao esta exportado, entao vc nao pode importar, precisa fazer um load para exportar o struct
 type conf struct {
 	DBDrive string `mapstructure:"DBDrive"` 
 	DBHost string `mapstructure:"DBHost"`
@@ -22,6 +21,8 @@ type conf struct {
 
 // passa o path de um arquivo que tem as configs 
 func LoadConfig(path string) (*conf, error){
+	cfg := conf{}
+
 	viper.SetConfigName("app_config")
 	viper.SetConfigType("env")
 	viper.AddConfigPath(path)
@@ -39,5 +40,5 @@ func LoadConfig(path string) (*conf, error){
 	}
 
 	cfg.TokenAuth = jwtauth.New("HS256", []byte(cfg.JwTSecret), nil)
-	return cfg, err
+	return &cfg, err
 }
