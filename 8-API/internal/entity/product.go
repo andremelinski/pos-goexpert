@@ -27,7 +27,6 @@ type Product struct{
 	Created_at time.Time `json:"created_at"`
 }
 
-
 func NewProduct(name string, price float64) (*Product, error){
 	product := &Product{
 		ID: entity.NewID(),

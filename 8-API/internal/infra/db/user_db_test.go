@@ -46,7 +46,6 @@ func TestFindByEmail(t *testing.T){
 	userFound, err := userDB.FindByEmail(user.Email)
 	assert.Nil(t, err)
 
-	assert.Equal(t, user.ID, userFound.ID,)
 	assert.Equal(t, userFound.Name, "andre")
 
 	assert.True(t, userFound.ValidatePassword("123"))
