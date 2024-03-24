@@ -7,6 +7,7 @@ require gorm.io/driver/sqlite v1.5.5
 require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
+	github.com/go-chi/chi/v5 v5.0.12 // indirect
 	github.com/go-chi/jwtauth v1.2.0 // indirect
 	github.com/goccy/go-json v0.3.5 // indirect
 	github.com/google/uuid v1.6.0 // indirect

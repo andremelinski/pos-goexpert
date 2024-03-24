@@ -9,14 +9,10 @@ import (
 
 // erros que a aplicacao pode ter ao longo do desenvolvimento dos endpoints:
 var (
-	// buscar pelo id
 	ErrRequiredID = errors.New("id is required")
-	// id nao eh um uuid
 	ErrInvalidID = errors.New("id is invalid")
-	// preenchimento de campos obrigtorios
 	ErrRequiredName = errors.New("name is required")
 	ErrRequiredPrice = errors.New("price is required")
-	// erro se user colocar um price <= 0
 	ErrInvalidPrice = errors.New("price is invalid")
 )
 // struct utilizada para salvar no BD
@@ -26,7 +22,6 @@ type Product struct{
 	Price float64 `json:"price"`
 	Created_at time.Time `json:"created_at"`
 }
-
 func NewProduct(name string, price float64) (*Product, error){
 	product := &Product{
 		ID: entity.NewID(),

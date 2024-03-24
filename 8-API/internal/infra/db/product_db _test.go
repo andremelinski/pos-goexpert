@@ -22,8 +22,13 @@ func TestCreateProduct(t *testing.T){
 
 	productDB := ProductInitDB(db)
 	err = productDB.Create(product)
+
+	productFound := entity.Product{}
+	db.First(&productFound, "name=?", product.Name)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, product.ID)
+	assert.Equal(t, productFound.Name,product.Name)
+	assert.Equal(t, productFound.Price, product.Price)
 }
 
 func TestFinalAllProducts(t *testing.T) {

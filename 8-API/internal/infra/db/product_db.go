@@ -48,7 +48,7 @@ func (p *ProductDB) Update(product *entity.Product) error{
 		return err 
 	}
 
-	return p.DB.Save(product).Error
+	return p.DB.Omit("created_at").Updates(product).Error
 }
 func (p *ProductDB) Delete(id string) error{
 	product, err := p.FindByID(id); if err != nil {
