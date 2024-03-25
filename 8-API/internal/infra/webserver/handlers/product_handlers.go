@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -85,8 +84,6 @@ func(productHandler *ProductHandler) GetProducts( w http.ResponseWriter, r *http
 
 	pageInt, _ := strconv.Atoi(page)
 	limitInt, _ := strconv.Atoi(limit)
-	fmt.Println(limitInt)
-
 
 	product, err := productHandler.ProductDB.FindAll(pageInt, limitInt, sort)
 	if err != nil{

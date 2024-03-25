@@ -1,8 +1,6 @@
 package entity
 
 import (
-	"fmt"
-
 	"github.com/andremelinski/pos-goexpert/8-API/pkg/entity"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -32,7 +30,6 @@ func NewUser(name, email, password string) (*User, error){
 
 // metodo pertencente unicamente a struct User
 func (u *User) ValidatePassword(password string) bool{
-	fmt.Println(u.Password)
 	err := bcrypt.CompareHashAndPassword([]byte(u.Password),[]byte(password))
 	return err == nil
 }

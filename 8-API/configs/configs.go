@@ -38,7 +38,7 @@ func LoadConfig(path string) (*conf, error){
 	if err != nil {
 		panic(err) 
 	}
-
+	// inicia o struct jwtauth por onde vai ser realizado o encode e decode  do jwt
 	cfg.TokenAuth = jwtauth.New("HS256", []byte(cfg.JwTSecret), nil)
 	return &cfg, err
 }
