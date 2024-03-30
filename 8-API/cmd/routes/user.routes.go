@@ -24,6 +24,6 @@ func (routes RoutesInit) UserRoutes(){
 	routes.Chi.Route("/user", func (r chi.Router){
 		r.Post("/", userHandler.CreateUser)
 		r.Get("/{email}", userHandler.GetUserByMail)
-		r.Post("/generateJwt", userHandler.GetJWT)
+		r.Post("/generate_token", userHandler.GetJWT)
 	})
 }

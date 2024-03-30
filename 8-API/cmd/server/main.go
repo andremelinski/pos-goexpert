@@ -6,13 +6,32 @@ import (
 
 	"github.com/andremelinski/pos-goexpert/8-API/cmd/routes"
 	"github.com/andremelinski/pos-goexpert/8-API/configs"
+	_ "github.com/andremelinski/pos-goexpert/8-API/docs"
 	"github.com/andremelinski/pos-goexpert/8-API/internal/entity"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	httpSwagger "github.com/swaggo/http-swagger"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
+// @title           Go Expert API Example
+// @version         1.0
+// @description     Product API with auhtentication
+// @termsOfService  http://swagger.io/terms/
+
+// @contact.name   Andre Melinski
+// @contact.url    http://www.fullcycle.com.br
+// @contact.email  andremelinski29@gmail.com.br
+
+// @license.name   Full Cycle License
+// @license.url    http://www.fullcycle.com.br
+
+// @host      localhost:8000
+// @BasePath  /
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
 func main(){
 	config, _ := configs.LoadConfig(".")
 	dbConfig, err := gorm.Open(sqlite.Open("test.db"))
@@ -33,6 +52,8 @@ func main(){
 	
 	routes.UserRoutesInit(rMux, dbConfig).UserRoutes()
 	routes.ProductRoutesInit(rMux, dbConfig, config.TokenAuth).ProductRoutes()
+
+	rMux.Get("/docs/*", httpSwagger.Handler(httpSwagger.URL("http://localhost:8000/docs/doc.json")))
 
 	http.ListenAndServe(":8000", rMux)
 }

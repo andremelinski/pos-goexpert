@@ -13,6 +13,10 @@ import (
 	"github.com/go-chi/jwtauth"
 )
 
+type Error struct {
+	Message string `json:"message"`
+}
+
 type UserHandler struct{
 	UserDB db.UserInterface
 	// JwtExpiresIn int
@@ -27,6 +31,16 @@ func UserHandlerInit(userDB db.UserInterface) *UserHandler{
 	}
 }
 
+// Create user godoc
+// @Summary      Create user
+// @Description  Create user
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param        request     body      dto.CreateUserInput  true  "user request"
+// @Success      201
+// @Failure      500         {object}  Error
+// @Router       /user [post]
 func (userHandler *UserHandler)CreateUser(w http.ResponseWriter, r *http.Request){
 	w.Header().Set("Content-Type", "application/json")
 	userPayload := dto.CreateUserInput{}
@@ -40,33 +54,48 @@ func (userHandler *UserHandler)CreateUser(w http.ResponseWriter, r *http.Request
 	userNormalized, err := entity.NewUser(userPayload.Name, userPayload.Email, userPayload.Password)
 	if err != nil{
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(err.Error())
+		error := Error{Message: err.Error()}
+		json.NewEncoder(w).Encode(error)
 		return 
 	}
 	err = userHandler.UserDB.Create(userNormalized)
 	if err != nil{
 		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(err.Error())
+		error := Error{Message: err.Error()}
+		json.NewEncoder(w).Encode(error)
 		return 
 	}
 	w.WriteHeader(http.StatusCreated)
 }
 
+// GetJWT godoc
+// @Summary      Get a user JWT
+// @Description  Get a user JWT
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param        request   body     dto.GetJWTInput  true  "user credentials"
+// @Success      200  {object}  dto.GetJWTOutput
+// @Failure      404  {object}  Error
+// @Failure      500  {object}  Error
+// @Router       /user/generate_token [post]
 func (userHandler *UserHandler)GetJWT(w http.ResponseWriter, r *http.Request){
 	userPayload := dto.GetJWTInput{}
 
 	err := json.NewDecoder(r.Body).Decode(&userPayload)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(err.Error())
+		error := Error{Message: err.Error() }
+		json.NewEncoder(w).Encode(error)
 		return 
 	}
 
 	userFound, err := userHandler.UserDB.FindByEmail(userPayload.Email)
 
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(err.Error())
+		w.WriteHeader(http.StatusNotFound)
+		error := Error{Message: err.Error() }
+		json.NewEncoder(w).Encode(error)
 		return 
 	}
 	if !userFound.ValidatePassword(userPayload.Password) {
@@ -76,18 +105,17 @@ func (userHandler *UserHandler)GetJWT(w http.ResponseWriter, r *http.Request){
 	// info que vai voltar do jwt
 	jwtAuth := r.Context().Value("jwt").(*jwtauth.JWTAuth)
 	jwtExpiresIn := r.Context().Value("jwtExpiresIn").(int)
-	_, stringToken, _ := jwtAuth.Encode(map[string]interface{}{
+	// gera o token pelo metodo encode. para escolher qual info que vai dentro do token, usa o map
+	_, tokenString, _ := jwtAuth.Encode(map[string]interface{}{
 		"sub": userFound.ID.String(),
 		"exp": time.Now().Add(time.Second * time.Duration(jwtExpiresIn)).Unix(),
 	})
 
-	token, _ := jwtAuth.Decode(stringToken)
+	token, _ := jwtAuth.Decode(tokenString)
 	fmt.Printf("token decoded -> expiraiton: %s",token.Expiration())
-
-	accessToken := struct{
-		AccessToken string `json:"access_token"`
-	}{
-		AccessToken: stringToken,
+	// monta a struct aqui pra poder serializar os dados do JSON e facilitar na resposta
+	accessToken := dto.GetJWTOutput{
+		AccessToken: tokenString,
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -108,7 +136,8 @@ func (userHandler *UserHandler)GetUserByMail(w http.ResponseWriter, r *http.Requ
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(err.Error())
+		error := Error{Message: err.Error() }
+		json.NewEncoder(w).Encode(error)
 		return 
 	}
 
