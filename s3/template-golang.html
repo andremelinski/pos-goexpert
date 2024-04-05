@@ -1,0 +1,88 @@
+<html>
+	<head>
+		<title>Invoice</title>
+		<style>
+			body {
+				font-family: 'Inconsolata', monospace;
+			}
+
+			.header {
+				display: flex;
+				flex-direction: row;
+				margin-bottom: 20px;
+			}
+
+			.address {
+				padding-right: 250px;
+			}
+
+			.address p {
+				margin: 0px;
+				font-size: 12px;
+			}
+
+			.container {
+				margin: 10px;
+				padding: 20px 150px 20px 150px;
+			}
+
+			.divider {
+				border: 1px solid #000;
+				margin-bottom: 20px;
+			}
+
+			.table-wrapper-shipping {
+				margin-bottom: 20px;
+				display: flex;
+				flex-direction: row;
+			}
+
+			table,
+			td,
+			th {
+				border: 1px solid black;
+				padding: 5px;
+			}
+
+			table {
+				border-collapse: collapse;
+				width: 100%;
+				font-size: 12px;
+			}
+
+			th {
+				padding-left: 10px;
+				height: 30px;
+				vertical-align: center;
+				text-align: left;
+				font-weight: bold;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="container">
+			<div class="header">
+				<div class="address">
+					<h4>Golang Inc.</h4>
+					<small> Universe street </small>
+				</div>
+			</div>
+			<div class="divider"></div>
+			<div class="table-wrapper" style="margin-bottom: 10px">
+				<table>
+					<tr>
+						<th>Name</th>
+						<th>Age</th>
+						<th>Country</th>
+					</tr>
+					<tr>
+						<td>{{.Name}}</td>
+						<td>{{.Age}}</td>
+						<td>{{.Country}}</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</body>
+</html>

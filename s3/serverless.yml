@@ -1,0 +1,62 @@
+service: myservice2
+
+frameworkVersion: '3'
+
+provider:
+    name: aws
+    architecture: arm64
+    runtime: provided.al2
+    stage: dev
+    environment:
+        S3Bucket: 's3-sqs-ts-bucket-dev-321123'
+    # set iam role policy to allow s3 access
+    iamRoleStatements:
+        - Effect: 'Allow'
+          Action:
+              - 's3:ListBucket'
+          Resource:
+              - 'arn:aws:s3:::${self:provider.environment.S3Bucket}'
+        - Effect: 'Allow'
+          Action:
+              - 's3:PutObject'
+              - 's3:GetObject'
+              - 's3:DeleteObject'
+          Resource:
+              - 'arn:aws:s3:::${self:provider.environment.S3Bucket}/*'
+
+package:
+    individually: true
+    patterns:
+        - '!./**'
+        - ./bin/**\
+        - '!wkhtmltox-0.12.6-4.amazonlinux2_lambda.zip'
+
+plugins:
+    - serverless-go-plugin
+
+custom:
+    go:
+        baseDir: . # folder where go.mod file lives, if set `handler` property should be set relatively to that folder
+        binDir: bin # target folder for binary files
+        cgo: 0 # CGO_ENABLED flag
+        cmd: GOARCH=arm64 GOOS=linux go build -tags lambda.norpc -o ./bin/bootstrap # compile command
+        monorepo: false # if enabled, builds function every directory (useful for monorepo where go.mod is managed by each function
+        supportedRuntimes: ['provided.al2'] # the plugin compiles a function only if runtime is declared here (either on function or provider level)
+        buildProvidedRuntimeAsBootstrap: true # if enabled, builds and archive function with only single "bootstrap" binary (useful for runtimes like provided.al2)
+
+layers:
+    test:
+        package:
+            artifact: wkhtmltox-0.12.6-4.amazonlinux2_lambda.zip
+
+functions:
+    example:
+        handler: main.go
+        layers:
+            - arn:aws:lambda:us-east-1:347599033421:layer:wkhtmltopdf-0_12_6:1
+        environment:
+            FONTCONFIG_PATH: /opt/fonts
+        events:
+            - httpApi:
+                  path: /hello
+                  method: get
