@@ -28,7 +28,7 @@ func (routes ProductRoutes) ProductRoutes(){
 	
 	routes.Chi.Route("/products", func (r chi.Router){
 		// chi usa o middleware jwtauth.Verifier pra verificar onde esta esse token e se ele eh valido, com base o secret na chave jwtauth.New("HS256", []byte(cfg.JwTSecret), nil);
-		// jwtauth.Authenticator -> pega o token que foi enviado pela requisicao e injeta o JwtAuth no nosso contexto e validaa de fato o jwt, batendo assinatura e expiration
+		// jwtauth.Authenticator -> pega o token que foi enviado pela requisicao e injeta o JwtAuth no nosso contexto e valida se de fato o jwt, batendo assinatura e expiration
 		r.Use(jwtauth.Verifier(routes.JwtAuth))
 		r.Use(jwtauth.Authenticator)
 		r.Post("/", productHandler.CreateProduct)

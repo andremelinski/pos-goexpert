@@ -35,6 +35,8 @@ import (
 func main(){
 	config, _ := configs.LoadConfig(".")
 	dbConfig, err := gorm.Open(sqlite.Open("test.db"))
+	// dsn := config.DBUser+":"+config.DBPassword+"@tcp("+config.DBHost+":"+config.WebServerPort+")/"+config.DBName+"?charset=utf8mb4&parseTime=True&loc=Local"
+	// dbConfig, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
 	if err !=nil{
 		panic(err)
@@ -44,7 +46,7 @@ func main(){
 	rMux := chi.NewRouter()
 	rMux.Use(middleware.Logger) // intercepta todas as requisicoes e injeta logs 
 	rMux.Use(middleware.Recoverer)
-	rMux.Use(LogRequest)
+	rMux.Use(LogRequest) // meu middleware intercepta todas as requisicoes e injeta logs, mas que poderia ser feito pra voltar sempre application/json 
 	// envia pelo contexto da req o metodos 
 	rMux.Use(middleware.WithValue("jwt", config.TokenAuth))
 	rMux.Use(middleware.WithValue("jwtExpiresIn", config.JwtExpiresIn))
@@ -53,7 +55,7 @@ func main(){
 	routes.UserRoutesInit(rMux, dbConfig).UserRoutes()
 	routes.ProductRoutesInit(rMux, dbConfig, config.TokenAuth).ProductRoutes()
 
-	rMux.Get("/docs/*", httpSwagger.Handler(httpSwagger.URL("http://localhost:8000/docs/doc.json")))
+	rMux.Get("/docs/*", httpSwagger.Handler(httpSwagger.URL("http://"+config.DBHost+":"+config.WebServerPort+"/docs/doc.json")))
 
 	http.ListenAndServe(":8000", rMux)
 }
