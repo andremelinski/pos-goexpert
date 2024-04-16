@@ -5,18 +5,23 @@ import (
 	"sync"
 )
 
+var goRoutines = 5
+
 func main(){
 	wg := sync.WaitGroup{}
 	forever := make(chan int)
+	wg.Add(goRoutines)
 	go recebe(forever)
-	consumer(forever, &wg)
+	go consumer(forever, &wg)
+	wg.Wait()
 }
 
 func recebe(ch chan int){
-	for i := 0; i < 5; i++ {
+	for i := 0; i < goRoutines; i++ {
 		println("antes do canal ter o valor")
 		ch <- i
-		println(i)
+		fmt.Printf("canal com valor %d\n",i)
+		fmt.Printf("canal %d\n",ch)
 		// for soh continua se o canal for liberado/consumido
 	}
 	//  apos o for loop nada mais entra no canal e com isso, nao da pra publicar mais e dai nao vem deadlock 
@@ -27,5 +32,6 @@ func recebe(ch chan int){
 func consumer(ch chan int, wg *sync.WaitGroup){
 	for v := range ch {
 		fmt.Printf("REcebeu %v \n", v)
+		wg.Done()
 	}
 }
