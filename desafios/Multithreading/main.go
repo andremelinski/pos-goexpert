@@ -9,9 +9,12 @@ import (
 	"github.com/andremelinski/pos-goexpert/desafios/Multithreading/apis"
 )
 
-//  go run main.go -cep=82540091
-// testes: colocar time.Sleep(time.Second*5) em 1 e ver se retorna outro
-// para simular que um CEP nao foi emcontrado em um mas em outro: setar o CEP em uma url e mandar o comando com um CEO errado no outro
+/**
+to test: go run main.go -cep=82540091
+testes:
+	- Colocar time.Sleep(time.Second*5) em 1 e ver se retorna outro
+	- Para simular que um CEP nao foi emcontrado em um mas em outro: setar o CEP em uma url e mandar o comando com um CEO errado no outro
+**/
 func main(){
 	ch1 := make(chan *apis.BrasilInfo)
 	ch2 := make(chan *apis.ViaCEPInfo)
