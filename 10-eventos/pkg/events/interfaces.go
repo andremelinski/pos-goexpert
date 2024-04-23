@@ -29,6 +29,5 @@ type EventDispatcherInterface interface{
 	// verifica se tem ou nao o evento com esse handler
 	Has(eventName string, handler EventHandlerInterface) bool
 	// limpa o event dispatcher
-	Clear() error
-	
+	Clear()
 }

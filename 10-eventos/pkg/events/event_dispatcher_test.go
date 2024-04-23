@@ -31,7 +31,7 @@ type TestEventHandler struct{
 }
 
 // aplicando EventHandlerInterface
-func (h *TestEventHandler)Handle(event EventInterface){}
+func (h *TestEventHandler) Handle(event EventInterface){}
 
 type EventDispatcherSuiteTest struct{
 	// faz com que todos os structs abaixo do suite serao testados
@@ -48,7 +48,7 @@ type EventDispatcherSuiteTest struct{
 func (suite *EventDispatcherSuiteTest) SetupTest(){
 	suite.eventDispatcher = NewEventDispatcher() 
 	suite.handler = TestEventHandler{
-		ID: 1,
+		ID: 11111111,
 	}
 	suite.handler2 = TestEventHandler{
 		ID: 2,
@@ -84,6 +84,28 @@ func (suite *EventDispatcherSuiteTest) TestEventDispatcher_Register_ErrorWithSam
 	err = suite.eventDispatcher.Register(suite.event.GetName(), &suite.handler)
 	assert.Error(suite.T(), err, "handlers already registered")
 	suite.Equal(1, len(suite.eventDispatcher.handlers[suite.event.GetName()]))
+}
+
+func (suite *EventDispatcherSuiteTest) TestEventDispatcher_Clear(){
+	err := suite.eventDispatcher.Register(suite.event.GetName(), &suite.handler)
+	assert.NoError(suite.T(), err)
+	suite.Equal(1, len(suite.eventDispatcher.handlers[suite.event.GetName()]))
+
+	suite.eventDispatcher.Clear()
+
+	err = suite.eventDispatcher.Register(suite.event.GetName(), &suite.handler)
+	assert.NoError(suite.T(), err)
+	suite.Equal(1, len(suite.eventDispatcher.handlers[suite.event.GetName()]))
+}
+
+func (suite *EventDispatcherSuiteTest) TestEventDispatcher_Has(){
+	err := suite.eventDispatcher.Register(suite.event.GetName(), &suite.handler)
+	assert.NoError(suite.T(), err)
+	suite.Equal(1, len(suite.eventDispatcher.handlers[suite.event.GetName()]))
+
+	hasBool := suite.eventDispatcher.Has(suite.event.GetName(), &suite.handler)
+	assert.True(suite.T(), hasBool)
+
 }
 
 func TestSuite(t *testing.T){
