@@ -1,6 +1,9 @@
 package events
 
-import "time"
+import (
+	"sync"
+	"time"
+)
 
 // Evento -> carrega Dados
 type EventInterface interface{
@@ -12,7 +15,7 @@ type EventInterface interface{
 //  operacoes que sao executados quando evento (Handle) eh chamado
 // Handle executa a operacao a partir dos eventos, os quais entao no EventInterface 
 type EventHandlerInterface interface{
-	Handle(EventInterface) 
+	Handle(EventInterface, *sync.WaitGroup) 
 }
 
 // Gerenciador dos eventos -> 
@@ -22,7 +25,8 @@ type EventHandlerInterface interface{
 type EventDispatcherInterface interface{
 	// registra um novo evento. Quando esse evento for executado, executa o handler pra ele
 	Register(eventName string, handler EventHandlerInterface) error
-	// fez com que os handlers sejam executados
+	// fez com que os handlers atrelados a um evento sejam executados.
+	// executa EventHandlerInterface
 	Dispatch(event EventInterface) error
 	// remove evento do event Dispatcher
 	Remove(eventName string, handler EventHandlerInterface) error

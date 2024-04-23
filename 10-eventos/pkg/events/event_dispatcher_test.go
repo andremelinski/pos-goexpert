@@ -1,10 +1,12 @@
 package events
 
 import (
+	"sync"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -31,7 +33,7 @@ type TestEventHandler struct{
 }
 
 // aplicando EventHandlerInterface
-func (h *TestEventHandler) Handle(event EventInterface){}
+func (h *TestEventHandler) Handle(event EventInterface, wg *sync.WaitGroup){}
 
 type EventDispatcherSuiteTest struct{
 	// faz com que todos os structs abaixo do suite serao testados
@@ -108,6 +110,34 @@ func (suite *EventDispatcherSuiteTest) TestEventDispatcher_Has(){
 
 }
 
+type MockHandler struct{
+	mock.Mock
+}
+
+// mock do que seria o Handle
+func (m *MockHandler) Handle(event EventInterface, wg *sync.WaitGroup){
+	// mock "executa" event
+	m.Called(event)
+	wg.Done()
+}
+
+// verifica se o metodo Handler da EventHandlerInterface foi chamado
+func (suite *EventDispatcherSuiteTest) TestEventDispatch_Dispatch() {
+	eh := &MockHandler{}
+	eh.On("Handle", &suite.event)
+
+    eh2 := &MockHandler{}
+    eh2.On("Handle", &suite.event)
+
+	suite.eventDispatcher.Register(suite.event.GetName(), eh)
+    suite.eventDispatcher.Register(suite.event.GetName(), eh2)
+
+	suite.eventDispatcher.Dispatch(&suite.event)
+	eh.AssertExpectations(suite.T())
+    eh2.AssertExpectations(suite.T())
+	eh.AssertNumberOfCalls(suite.T(), "Handle", 1)
+    eh2.AssertNumberOfCalls(suite.T(), "Handle", 1)
+}
 func TestSuite(t *testing.T){
 	suite.Run(t, new(EventDispatcherSuiteTest))
 }

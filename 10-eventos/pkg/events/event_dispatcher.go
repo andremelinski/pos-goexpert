@@ -2,6 +2,7 @@ package events
 
 import (
 	"errors"
+	"sync"
 )
 
 // 1 evento pode ter diversos handlers registrados
@@ -51,6 +52,18 @@ func (ed *EventDispatcher) Has(eventName string, handler EventHandlerInterface) 
 	return false
 }
 
+func (ed *EventDispatcher) Dispatch(event EventInterface) error {
+	if eventHandlerInterfaceArr, ok := ed.handlers[event.GetName()]; ok {
+		wg := &sync.WaitGroup{}
+		wg.Add(len(eventHandlerInterfaceArr))
+		for _, handler := range eventHandlerInterfaceArr {
+			go handler.Handle(event, wg) 
+		}
+		wg.Wait()
+	}
+	return nil
+}
+
 func (ed *EventDispatcher) Remove(eventName string, handler EventHandlerInterface) error {
 	// nome do evento ja existe
 	if eventHandlerInterfaceArr, ok := ed.handlers[eventName]; ok {
@@ -68,15 +81,4 @@ func (ed *EventDispatcher) Remove(eventName string, handler EventHandlerInterfac
 func (ed *EventDispatcher) Clear() {
 	// nome do evento ja existe
 	ed.handlers = make(map[string][]EventHandlerInterface)
-}
-
-func (ed *EventDispatcher) Dispatch(event EventInterface) error {
-	// nome do evento ja existe
-	if handlersArr, ok  := ed.handlers[event.GetName()]; ok {
-		for _, h := range handlersArr {
-			h.Handle(event)
-		}
-	}
-
-	return nil
 }
