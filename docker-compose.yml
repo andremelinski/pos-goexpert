@@ -1,15 +1,27 @@
 version: '3.7'
 
 services:
-  mysql:
-    image: mysql:latest
-    container_name: mysql
-    restart: always
-    platform: linux/amd64
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: goexpert
-      MYSQL_PASSWORD: root
-    ports:
-      - 3306:3306
-# mysql -uroot -p goexpert
+    # mysql:
+    #   image: mysql:latest
+    #   container_name: mysql
+    #   restart: always
+    #   platform: linux/amd64
+    #   environment:
+    #     MYSQL_ROOT_PASSWORD: root
+    #     MYSQL_DATABASE: goexpert
+    #     MYSQL_PASSWORD: root
+    #   ports:
+    #     - 3306:3306
+    # mysql -uroot -p goexpert
+    rabbitmq:
+        image: rabbitmq:3.8.16-management
+        container_name: rabbitmq
+        hostname: rabbitmq
+        ports:
+            - '5672:5672'
+            - '15672:15672'
+            - '15692:15692'
+        environment:
+            - RABBITMQ_DEFAULT_USER=guest
+            - RABBITMQ_DEFAULT_PASS=guest
+            - RABBITMQ_DEFAULT_VHOST=/
