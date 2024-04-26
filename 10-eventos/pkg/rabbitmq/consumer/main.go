@@ -13,7 +13,10 @@ func main(){
 	if err != nil{
 		panic(err)
 	}
-	go rabbitmq.Consume(chn, msgs)
+	defer chn.Close()
+
+	go rabbitmq.Consume(chn, msgs, "queue")
+
 	for v := range msgs {
 		fmt.Println(string(v.Body))
 		v.Ack(false)

@@ -39,9 +39,9 @@ func NewNotificationDB(db *dynamodb.Client) *NotificationDB{
 
 func (db *NotificationDB) GetAll() ([]map[string]interface{}, error) {
 	var output []map[string]interface{}
-	var response *dynamodb.ExecuteStatementOutput
 	var err error
 	var nextToken *string
+	response := &dynamodb.ExecuteStatementOutput{}
 	for moreData := true; moreData; {
 		response, err = db.dbConfig.ExecuteStatement(context.TODO(), &dynamodb.ExecuteStatementInput{
 			Statement: aws.String(
