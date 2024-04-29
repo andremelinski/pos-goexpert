@@ -1,0 +1,1 @@
+https://medium.com/trendyol-tech/rabbitmq-exchange-types-d7e1f51ec825
