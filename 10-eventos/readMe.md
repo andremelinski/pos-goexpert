@@ -1,1 +1,2 @@
-https://medium.com/trendyol-tech/rabbitmq-exchange-types-d7e1f51ec825
+-   https://medium.com/trendyol-tech/rabbitmq-exchange-types-d7e1f51ec825
+-   https://www.rabbitmq.com/tutorials/tutorial-four-go
