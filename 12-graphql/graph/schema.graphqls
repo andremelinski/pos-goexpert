@@ -1,0 +1,44 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+#  ! -> By default, all value types in GraphQL can result in a null value. If a value type includes an exclamation point, it means that value cannot be null.
+type Course {
+	id: ID!
+	name: String!
+	description: String
+	category: Category!
+}
+
+type Category {
+	id: ID!
+	name: String!
+	description: String
+	# one to many
+	coures: [Course!]!
+}
+
+# inputs ajudam na etrada de dados. Quais campos vc precisa para 1 nova categoria
+input NewCategory {
+	name: String!
+	description: String
+}
+
+input NewCourse {
+	name: String!
+	description: String
+	categoryId: ID!
+}
+
+# quais queries gostaria
+type Query {
+	categories: [Category!]!
+	courses: [Course!]!
+	# course(id: ID!): Course
+}
+
+# mutation: quando vc altera algum modelo, criando ou alterando dados
+
+type Mutation {
+	createCategory(input: NewCategory!): Category!
+	createCourse(input: NewCourse!): Course!
+}

@@ -1,0 +1,3 @@
+-   para gerar um graphql padrao: go run github.com/99designs/gqlgen init;
+-   para atualizar os dados do schema.graphqls: go run github.com/99designs/gqlgen generate
+-   Resolver: tenta "resolver" um problema. exemplo: quero criar uma nova categoria, o resolver CreateCategory eh executado quando executamos uma mutatation no graphQL pra criar uma categoria
