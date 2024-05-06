@@ -29,8 +29,9 @@ func main() {
 
 	// para conectar a layer database com a layer que pega os dados, injeta no Resolver
 	categoryDb := database.NewCategory(db)
+	courseDb := database.NewCourse(db)
 
-	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{categoryDb}}))
+	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{CategoryDB: categoryDb, CourseDB: courseDb}}))
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	http.Handle("/query", srv)

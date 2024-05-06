@@ -1,11 +1,11 @@
 # Where are all the schema files located? globs are supported eg  src/**/*.graphqls
 schema:
-  - graph/*.graphqls
+    - graph/*.graphqls
 
 # Where should the generated server code go?
 exec:
-  filename: graph/generated.go
-  package: graph
+    filename: graph/generated.go
+    package: graph
 
 # Uncomment to enable federation
 # federation:
@@ -14,17 +14,17 @@ exec:
 
 # Where should any generated models go?
 model:
-  filename: graph/model/models_gen.go
-  package: model
+    filename: graph/model/models_gen.go
+    package: model
 
 # Where should the resolver implementations go?
 resolver:
-  layout: follow-schema
-  dir: graph
-  package: graph
-  filename_template: "{name}.resolvers.go"
-  # Optional: turn on to not generate template comments above resolvers
-  # omit_template_comment: false
+    layout: follow-schema
+    dir: graph
+    package: graph
+    filename_template: '{name}.resolvers.go'
+    # Optional: turn on to not generate template comments above resolvers
+    # omit_template_comment: false
 
 # Optional: turn on use ` + "`" + `gqlgen:"fieldName"` + "`" + ` tags in your models
 # struct_tag: json
@@ -74,14 +74,20 @@ autobind:
 # modelgen, the others will be allowed when binding to fields. Configure them to
 # your liking
 models:
-  ID:
-    model:
-      - github.com/99designs/gqlgen/graphql.ID
-      - github.com/99designs/gqlgen/graphql.Int
-      - github.com/99designs/gqlgen/graphql.Int64
-      - github.com/99designs/gqlgen/graphql.Int32
-  Int:
-    model:
-      - github.com/99designs/gqlgen/graphql.Int
-      - github.com/99designs/gqlgen/graphql.Int64
-      - github.com/99designs/gqlgen/graphql.Int32
+    Course:
+        model:
+            - github.com/andremelinski/pos-goexpert/12-graphql/graph/model.Course
+    Category:
+        model:
+            - github.com/andremelinski/pos-goexpert/12-graphql/graph/model.Category
+    ID:
+        model:
+            - github.com/99designs/gqlgen/graphql.ID
+            - github.com/99designs/gqlgen/graphql.Int
+            - github.com/99designs/gqlgen/graphql.Int64
+            - github.com/99designs/gqlgen/graphql.Int32
+    Int:
+        model:
+            - github.com/99designs/gqlgen/graphql.Int
+            - github.com/99designs/gqlgen/graphql.Int64
+            - github.com/99designs/gqlgen/graphql.Int32
