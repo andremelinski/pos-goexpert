@@ -9,11 +9,11 @@ type Course {
 	category: Category!
 }
 
+# one Category to many Courses
 type Category {
 	id: ID!
 	name: String!
 	description: String
-	# one to many
 	courses: [Course!]!
 }
 

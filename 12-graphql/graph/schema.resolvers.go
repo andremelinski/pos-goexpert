@@ -14,8 +14,8 @@ import (
 func (r *categoryResolver) Courses(ctx context.Context, obj *model.Category) ([]*model.Course, error) {
 	courses, err := r.CourseDB.FindCoursesByCategoryId(obj.ID)
 
-	if err != nil{
-			return nil, err
+	if err != nil {
+		return nil, err
 	}
 
 	coursesArr := []*model.Course{}
@@ -28,6 +28,22 @@ func (r *categoryResolver) Courses(ctx context.Context, obj *model.Category) ([]
 	}
 
 	return coursesArr, nil
+}
+
+// Category is the resolver for the category field.
+func (r *courseResolver) Category(ctx context.Context, obj *model.Course) (*model.Category, error) {
+	category, err := r.CategoryDB.FindCategoryByCourseId(obj.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	categoriesModel := &model.Category{
+		ID:          category.ID,
+		Name:        category.Name,
+		Description: &category.Description,
+	}
+
+	return categoriesModel, nil
 }
 
 // CreateCategory is the resolver for the createCategory field.
@@ -99,13 +115,16 @@ func (r *queryResolver) Courses(ctx context.Context) ([]*model.Course, error) {
 // Category returns CategoryResolver implementation.
 func (r *Resolver) Category() CategoryResolver { return &categoryResolver{r} }
 
+// Course returns CourseResolver implementation.
+func (r *Resolver) Course() CourseResolver { return &courseResolver{r} }
+
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
-// categoryResolver -> Resolver onde vc consegue fazer a juncao das categories com o curso
 type categoryResolver struct{ *Resolver }
+type courseResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
