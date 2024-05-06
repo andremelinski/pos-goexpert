@@ -53,7 +53,33 @@ func (c *Course) LoadAll() ([]Course, error){
 	return courses, nil
 }
 
-func (r Course)findCategoryById(categoryId string) (*string, error){
+func (r Course) FindCoursesByCategoryId(categoryId string) ([]Course, error){
+	query, err := r.db.Prepare("SELECT id, name, description, category_id FROM courses WHERE category_id = $1")
+	if err != nil{
+			return nil, err
+	}
+	
+	coursesRows,err := query.Query(categoryId)
+
+	if err != nil{
+			return nil, err
+	}
+	defer coursesRows.Close()
+	
+	courses := []Course{}
+	for coursesRows.Next() {
+		course := Course{}
+		err = coursesRows.Scan(&course.ID, &course.Name,  &course.Description, &course.CategoryID)
+		if err != nil{
+			return nil, err
+		}
+		courses = append(courses, course)
+	}
+
+	return courses, nil
+}
+
+func (r Course) findCategoryById(categoryId string) (*string, error){
 	queryRow := r.db.QueryRow("SELECT id FROM categories WHERE id=?", categoryId)
 	if queryRow.Err() != nil{
 		return nil, queryRow.Err()

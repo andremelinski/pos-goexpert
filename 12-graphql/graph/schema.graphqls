@@ -14,7 +14,7 @@ type Category {
 	name: String!
 	description: String
 	# one to many
-	coures: [Course!]!
+	courses: [Course!]!
 }
 
 # inputs ajudam na etrada de dados. Quais campos vc precisa para 1 nova categoria

@@ -4,7 +4,10 @@
 
 ### Para fazer a relacao Courses + Categories, ou Dados encadeados, no Graphql:
 
-<p>Dados encadeados Realizados de maneira explicita</p>
-<p>1- Criar 2 arquivos separados com os seus models dentro de graph/model</p>
-<p>2- ir em gqlgen.ylm (arquivo base para a criacao do graphql, como resolvers, models, etc) e dentro de models adicional o path dos 2 novos models (courses e categories).</p>
+<li>Dados encadeados Realizados de maneira explicita</li>
+<ol>
+    <li>Criar 2 arquivos (course e category) com os seus models dentro de graph/model</li>
+    <li>ir em gqlgen.ylm (arquivo base para a criacao do graphql, como resolvers, models, etc) e dentro de models adicional o path dos 2 novos models (courses e categories).</li>
+    <li>Deletar o bind de Courses em category.go. O GraphQL deve reconhecer ao mandar o comando generate e criarmos mais um resolver para fazermos esse bind</li>
+</ol>
 Ao fazer isso, quando vc mandar gerar novamente com o comando go run github.com/99designs/gqlgen generate e um Resolver devera ser gerado. Nesse caso, o resolver devera fazer relacao do model Courses com Categories

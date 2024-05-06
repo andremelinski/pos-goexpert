@@ -10,16 +10,36 @@ import (
 	"github.com/andremelinski/pos-goexpert/12-graphql/graph/model"
 )
 
+// Courses is the resolver for the courses field. -> aqui onde volta a resposta do bind. por isso Courses esta dentro de categoryResolver
+func (r *categoryResolver) Courses(ctx context.Context, obj *model.Category) ([]*model.Course, error) {
+	courses, err := r.CourseDB.FindCoursesByCategoryId(obj.ID)
+
+	if err != nil{
+			return nil, err
+	}
+
+	coursesArr := []*model.Course{}
+	for _, course := range courses {
+		coursesArr = append(coursesArr, &model.Course{
+			ID:          course.ID,
+			Name:        course.Name,
+			Description: &course.Description,
+		})
+	}
+
+	return coursesArr, nil
+}
+
 // CreateCategory is the resolver for the createCategory field.
 func (r *mutationResolver) CreateCategory(ctx context.Context, input model.NewCategory) (*model.Category, error) {
 	category, err := r.CategoryDB.Create(input.Name, *input.Description)
-	if err != nil{
+	if err != nil {
 		return nil, err
 	}
 
 	return &model.Category{
-		ID: category.ID, 
-		Name: category.Name, 
+		ID:          category.ID,
+		Name:        category.Name,
 		Description: &category.Description,
 	}, nil
 }
@@ -27,13 +47,13 @@ func (r *mutationResolver) CreateCategory(ctx context.Context, input model.NewCa
 // CreateCourse is the resolver for the createCourse field.
 func (r *mutationResolver) CreateCourse(ctx context.Context, input model.NewCourse) (*model.Course, error) {
 	course, err := r.CourseDB.Create(input.Name, *input.Description, input.CategoryID)
-		if err != nil{
+	if err != nil {
 		return nil, err
 	}
 
 	return &model.Course{
-		ID: course.ID, 
-		Name: course.Name, 
+		ID:          course.ID,
+		Name:        course.Name,
 		Description: &course.Description,
 	}, nil
 }
@@ -41,15 +61,15 @@ func (r *mutationResolver) CreateCourse(ctx context.Context, input model.NewCour
 // Categories is the resolver for the categories field.
 func (r *queryResolver) Categories(ctx context.Context) ([]*model.Category, error) {
 	categories, err := r.CategoryDB.LoadAll()
-		if err != nil{
+	if err != nil {
 		return nil, err
 	}
 
 	categoriesModel := []*model.Category{}
 	for _, category := range categories {
 		categoriesModel = append(categoriesModel, &model.Category{
-			ID: category.ID,
-			Name: category.Name,
+			ID:          category.ID,
+			Name:        category.Name,
 			Description: &category.Description,
 		})
 	}
@@ -60,15 +80,15 @@ func (r *queryResolver) Categories(ctx context.Context) ([]*model.Category, erro
 // Courses is the resolver for the courses field.
 func (r *queryResolver) Courses(ctx context.Context) ([]*model.Course, error) {
 	courses, err := r.CourseDB.LoadAll()
-		if err != nil{
+	if err != nil {
 		return nil, err
 	}
 
 	coursesModel := []*model.Course{}
 	for _, course := range courses {
 		coursesModel = append(coursesModel, &model.Course{
-			ID: course.ID,
-			Name: course.Name,
+			ID:          course.ID,
+			Name:        course.Name,
 			Description: &course.Description,
 		})
 	}
@@ -76,11 +96,16 @@ func (r *queryResolver) Courses(ctx context.Context) ([]*model.Course, error) {
 	return coursesModel, nil
 }
 
+// Category returns CategoryResolver implementation.
+func (r *Resolver) Category() CategoryResolver { return &categoryResolver{r} }
+
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
+// categoryResolver -> Resolver onde vc consegue fazer a juncao das categories com o curso
+type categoryResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
