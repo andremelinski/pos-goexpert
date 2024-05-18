@@ -72,3 +72,19 @@ Copia os parametros dessa funcao e coloca no service.go e Devemos retornar a inf
 </p>
 
 ### servidor gRPC
+
+instala o https://github.com/ktr0731/evans
+
+-   Motivo: created to use easier than other existing gRPC clients
+
+```
+<!-- Criar tablea de categorias -->
+sqlit3 data.db
+create table categories (id stirng, name string, descirption string )
+
+<!-- evans -->
+evans -r repl
+<!-- seleciona o servico que deseja -->
+service CategoryService
+call CreateCategory
+```
