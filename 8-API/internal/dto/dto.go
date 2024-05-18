@@ -2,6 +2,7 @@ package dto
 
 // utilizado para limpar o que vem da request antes de ir para as outras camadas
 //  assim fica mais facil de fazer o bind entre camadas pq a info ta limpa
+// serao sempre dados primitivos.
 
 type CreateProductInput struct{
 	Name string `json:"name"`

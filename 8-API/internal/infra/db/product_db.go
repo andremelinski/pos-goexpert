@@ -5,6 +5,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// ISSO DAQUI SERIA O REPOSITORY -> sempre passa o context para openTelemetry
 type ProductDB struct {
 	DB *gorm.DB
 }
