@@ -48,9 +48,9 @@ func (c *Category) LoadAll() ([]Category, error){
 	return catgories, nil
 }
 
-func (c *Category) FindCategoryByCourseId(coursrId string) (Category, error){
+func (c *Category) LoadCategoryById(categoryId string) (Category, error){
 	category := Category{}
-	err := c.db.QueryRow("SELECT c.id, c.name, c.description FROM categories c JOIN courses co ON c.id = co.category_id WHERE co.id = $1", coursrId).Scan(&category.ID, &category.Name, &category.Description);
+	err := c.db.QueryRow("SELECT c.id, c.name, c.description FROM categories c WHERE c.id = $1", categoryId).Scan(&category.ID, &category.Name, &category.Description);
 
 	if err != nil {
 		return Category{}, err

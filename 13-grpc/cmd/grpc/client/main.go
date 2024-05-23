@@ -25,11 +25,26 @@ func main(){
 
 	client := pb.NewCategoryServiceClient(conn)
 
-	feature, err := client.CreateCategory(context.Background(), &pb.CreateCategoryRequest{Name:"random name", Description: "dsescrpition"})
+	// newUser, err := client.CreateCategory(context.Background(), &pb.CreateCategoryRequest{Name:"random name", Description: "dsescrpition"})
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	// log.Println(newUser)
+
+	in := &pb.Blank{}
+	categories, err := client.ListCategory(context.Background(), in)
 	if err != nil {
 		panic(err)
 	}
 
-	log.Println(feature)
+	log.Println(categories)
+	id := &pb.CategoryIdRequest{Id:"2ee6e3c1-02fc-48ff-8b55-7ba878b98183"}
+	category, err := client.GetCategory(context.Background(), id)
+	if err != nil {
+		panic(err)
+	}
+
+	log.Println(category)
 	defer conn.Close()
 }

@@ -60,6 +60,8 @@ Tanto o client como o server manda dados de maneira continua.
 https://grpc.io/docs/languages/go/quickstart/
 
 ```
+export PATH="$PATH:$(go env GOPATH)/bin"
+
 protoc --go_out=. --go-grpc_out=.  ./proto/course_category.proto
 ```
 
