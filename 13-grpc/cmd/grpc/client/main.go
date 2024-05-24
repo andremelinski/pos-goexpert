@@ -38,7 +38,7 @@ func main(){
 		panic(err)
 	}
 
-	log.Println(categories)
+	log.Println(categories.Categories)
 	id := &pb.CategoryIdRequest{Id:"2ee6e3c1-02fc-48ff-8b55-7ba878b98183"}
 	category, err := client.GetCategory(context.Background(), id)
 	if err != nil {

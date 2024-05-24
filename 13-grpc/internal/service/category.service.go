@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"io"
 
 	"github.com/andremelinski/pos-goexpert/13-grpc/internal/database"
 	"github.com/andremelinski/pos-goexpert/13-grpc/internal/pb"
@@ -46,11 +47,12 @@ func (cs *CategoryService) ListCategory(ctx context.Context, in *pb.Blank) (*pb.
 	categoriesResponse := []*pb.Category{}
 
 	for _, category := range categories {
-		categoriesResponse = append(categoriesResponse, &pb.Category{
+		categoryResponse := &pb.Category{
 		Id: category.ID,
 		Name: category.Name,
 		Description: category.Description,
-	})
+	}
+		categoriesResponse = append(categoriesResponse, categoryResponse)
 	}
 
 	return &pb.CategoryListResponse{
@@ -74,4 +76,30 @@ func (cs *CategoryService) GetCategory(ctx context.Context, in *pb.CategoryIdReq
 	return &pb.CategoryResponse{
 		Category: categoriesResponse,
 	}, nil
+}
+
+func (cs *CategoryService) CreateCategoryStream(stream pb.CategoryService_CreateCategoryStreamServer) error {
+	categories := &pb.CategoryListResponse{}
+	//  cria um loop infinito pq ele eh responsavel por mandar esse stream de dados
+	for{
+		// recebe os dados pra criar a categoria
+		category, err := stream.Recv()
+		//  final do stream
+		if err == io.EOF{
+			return stream.SendAndClose(categories)
+		}
+		if err != nil {
+			return err
+		}
+
+		newCategory, err := cs.categoryDb.Create(category.Name, category.Description)
+		if err != nil {
+			return err
+		}
+		categories.Categories = append(categories.Categories, &pb.Category{
+			Id: newCategory.ID,
+			Name: newCategory.Name,
+			Description: newCategory.Description,
+		})
+	}
 }
