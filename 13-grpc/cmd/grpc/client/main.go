@@ -49,21 +49,39 @@ func main(){
 	// log.Println(category)
 	// defer conn.Close()
 
-	stream, err := client.CreateCategoryStream(context.Background())
+	// stream, err := client.CreateCategoryStream(context.Background())
+	// for i := 0; i < 10; i++ {
+	// 	name := fmt.Sprintf("category from stream %d", i)
+	// 	err := stream.Send(&pb.CreateCategoryRequest{Name: name, Description: "description"})
+	// 	if err != nil {
+	// 		log.Fatalln("Send stream",err)
+	// 	}
+
+	// 	time.Sleep(100*time.Millisecond)
+	// }
+	// res, err := stream.CloseAndRecv()
+	// if err != nil {
+	// 	log.Fatalln("CloseAndRecv stream",err)
+	// }
+
+	// fmt.Println(res.Categories)
+	// defer conn.Close()
+
+	stream, err := client.CreateCategoryStreamBidirectional(context.Background())
 	for i := 0; i < 10; i++ {
-		name := fmt.Sprintf("category from stream %d", i)
+		name := fmt.Sprintf("category from bidirectional stream %d", i)
 		err := stream.Send(&pb.CreateCategoryRequest{Name: name, Description: "description"})
 		if err != nil {
 			log.Fatalln("Send stream",err)
 		}
-
 		time.Sleep(100*time.Millisecond)
+		
+		res, err := stream.Recv()
+		if err != nil {
+			log.Fatalln("CloseAndRecv stream",err)
+		}
+	
+		fmt.Println(res)
 	}
-	res, err := stream.CloseAndRecv()
-	if err != nil {
-		log.Fatalln("CloseAndRecv stream",err)
-	}
-
-	fmt.Println(res.Categories)
 	defer conn.Close()
 }
