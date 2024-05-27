@@ -6,7 +6,7 @@ import (
 )
 
 func main(){
-	for i := 0; i < 100; i++ {
+	for i := 0; i < 501; i++ {
 		fileName := fmt.Sprintf("../tmp/file_%d.txt",i)
 		f, err := os.Create( fileName)
 		if err != nil {

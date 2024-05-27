@@ -32,38 +32,13 @@ func main(){
 	ch := make( chan struct{}, 100)
 
 	// esse channel vai controlar quem falhou para fazer a retentativa de upload do arquivo.
-	// todo erro que ocorrer, jogar o nome do arquivo nesse canal e se cair algo aquim retentar o upload
-	ch2 := make(chan string)
+	// todo erro que ocorrer, jogar o nome do arquivo nesse canal e se cair algo aqui retentar o upload
+	ch2 := make(chan string, 10)
 
 	
 	// readFiles(dirPath)
 	readFilesAndUploadToS3( ch, ch2)
 }
-
-
-//  using range -> one upload at a time
-// func readFiles(dirPath string){
-//     // Open the directory
-// 	dirFiles, err := os.ReadDir(dirPath)
-    
-// 	if err != nil {
-//         log.Fatal(err)
-// 	}
-
-//     // Iterate through the files and read their content
-//     for _, fileInfo := range dirFiles {
-//         if !fileInfo.IsDir() {
-//             filePath := filepath.Join(dirPath, fileInfo.Name())
-//             content, err := os.ReadFile(filePath)
-
-//             if err != nil {
-//                 log.Fatal(err)
-//             }
-//             fmt.Printf("File: %s\nContent:\n%s\n", filePath, content)
-//         }
-//     }
-// }
-
 func readFilesAndUploadToS3(uploadControl chan struct{}, errorFileUpload chan string){
 	dir, err := os.Open(dirPath)
 	if err != nil {
@@ -73,7 +48,7 @@ func readFilesAndUploadToS3(uploadControl chan struct{}, errorFileUpload chan st
 
 	go retryErrorFileUpload(uploadControl, errorFileUpload)
 
-	for {		
+	for {
 		files, err := dir.ReadDir(1)
 		if err != nil {
 			if err == io.EOF {
@@ -93,13 +68,14 @@ func readFilesAndUploadToS3(uploadControl chan struct{}, errorFileUpload chan st
 }
 
 func uploadToS3( fileName string, bucketName string, uploadControl <-chan struct{}, errorFileUpload chan<- string)  {
-	defer wg.Wait()
+	defer wg.Done()
 
 	content, err := readFilesFromDir(fileName)
 	//  soh ocorre aqui quando nao eh possivel ler o arquivo de dentro da pasta
 	if err != nil {
 		<-uploadControl // esvazia o canal se der erro para outro tentar
 		errorFileUpload <- fileName // carrega o nome do arquivo para retentativa
+		return 
 	}
 
 	_, err = s3Client.PutObject(&s3.PutObjectInput{
@@ -143,3 +119,27 @@ func readFilesFromDir(fileName string) ([]byte, error){
 	fmt.Printf("File: %s\tContent: %s\n", filePath, content)
 	return content, nil
 }
+
+//  using range -> one upload at a time
+// func readFiles(dirPath string){
+//     // Open the directory
+// 	dirFiles, err := os.ReadDir(dirPath)
+    
+// 	if err != nil {
+//         log.Fatal(err)
+// 	}
+
+//     // Iterate through the files and read their content
+//     for _, fileInfo := range dirFiles {
+//         if !fileInfo.IsDir() {
+//             filePath := filepath.Join(dirPath, fileInfo.Name())
+//             content, err := os.ReadFile(filePath)
+
+//             if err != nil {
+//                 log.Fatal(err)
+//             }
+//             fmt.Printf("File: %s\nContent:\n%s\n", filePath, content)
+//         }
+//     }
+// }
+
