@@ -67,7 +67,7 @@ func readFilesAndUploadToS3(uploadControl chan struct{}, errorFileUpload chan st
 	wg.Wait()
 }
 
-func uploadToS3( fileName string, bucketName string, uploadControl <-chan struct{}, errorFileUpload chan<- string)  {
+func uploadToS3( fileName, bucketName string, uploadControl <-chan struct{}, errorFileUpload chan<- string)  {
 	defer wg.Done()
 
 	content, err := readFilesFromDir(fileName)
