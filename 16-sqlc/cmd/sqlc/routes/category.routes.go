@@ -22,10 +22,10 @@ func CategoryRoutesInit(chi *chi.Mux, dbConfig *sql.DB)*RoutesInit{
 
 
 func (routes RoutesInit) CategoryRoutes(){
+	a := db.New(routes.DbConfig)
+	categoryHandler := handler.CategoryHandlerInit(a)
 
 	routes.Chi.Route("/category", func (r chi.Router){
-		a := db.New(routes.DbConfig)
-		categoryHandler := handler.CategoryHandlerInit(a)
 		r.Post("/", categoryHandler.CreateUser)
 		// r.Get("/{id}", categoryHandler.GetCategoryById)
 	})

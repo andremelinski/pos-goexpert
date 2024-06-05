@@ -23,8 +23,7 @@ func main(){
 	if err !=nil{
 		panic(err)
 	}
-
-	routes.CategoryRoutesInit(rMux, dbConfig)
+	routes.CategoryRoutesInit(rMux, dbConfig).CategoryRoutes()
 	
 	http.ListenAndServe(":8000", rMux)
 }

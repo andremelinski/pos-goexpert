@@ -39,7 +39,7 @@ func (userHandler *CategoryHandler)CreateUser(w http.ResponseWriter, r *http.Req
 	userNormalized := db.CreateCategoryParams{
 		ID: uuid.New().String(),
 		Name: categoryPayload.Name, 
-		Description: sql.NullString{String: categoryPayload.Description},
+		Description: sql.NullString{String: categoryPayload.Description, Valid: true},
 	}
 	// if err != nil{
 	// 	w.WriteHeader(http.StatusBadRequest)
