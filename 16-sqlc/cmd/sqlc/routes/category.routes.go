@@ -27,6 +27,8 @@ func (routes RoutesInit) CategoryRoutes(){
 
 	routes.Chi.Route("/category", func (r chi.Router){
 		r.Post("/", categoryHandler.CreateUser)
-		// r.Get("/{id}", categoryHandler.GetCategoryById)
+		r.Get("/", categoryHandler.GetCategories)
+		r.Get("/{id}", categoryHandler.GetCategory)
+		// r.Delete("/{id}", categoryHandler.DeleteCategoryById)
 	})
 }

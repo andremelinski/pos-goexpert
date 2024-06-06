@@ -16,7 +16,7 @@ func main(){
 	config := configs.LoadConfig(".")
 	rMux := chi.NewRouter()
 
-	dsn := config.DBUser+":"+config.DBPassword+"@tcp("+config.DBHost+":"+config.WebServerPort+")/"+config.DBName+"?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := config.DBUser+":"+config.DBPassword+"@tcp("+config.DBHost+":"+config.DBPort+")/"+config.DBName+"?charset=utf8mb4&parseTime=True&loc=Local"
 
 	dbConfig, err := sql.Open("mysql", dsn)
 

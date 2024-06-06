@@ -9,6 +9,7 @@ import (
 	"github.com/andremelinski/pos-goexpert/16-sqlc/internal/db"
 	"github.com/andremelinski/pos-goexpert/16-sqlc/internal/interfaces"
 	"github.com/andremelinski/pos-goexpert/16-sqlc/internal/web/dto"
+	"github.com/go-chi/chi"
 	"github.com/google/uuid"
 )
 type Error struct {
@@ -26,7 +27,7 @@ func CategoryHandlerInit(categoryDB interfaces.CategoryInterface) *CategoryHandl
 	}
 }
 
-func (userHandler *CategoryHandler)CreateUser(w http.ResponseWriter, r *http.Request){
+func (ch *CategoryHandler)CreateUser(w http.ResponseWriter, r *http.Request){
 	w.Header().Set("Content-Type", "application/json")
 	categoryPayload := dto.CreateCategoryInput{}
 	err := json.NewDecoder(r.Body).Decode(&categoryPayload)
@@ -47,7 +48,7 @@ func (userHandler *CategoryHandler)CreateUser(w http.ResponseWriter, r *http.Req
 	// 	json.NewEncoder(w).Encode(error)
 	// 	return 
 	// }
-	_, err = userHandler.categoryDB.CreateCategory(context.Background(), userNormalized)
+	_, err = ch.categoryDB.CreateCategory(context.Background(), userNormalized)
 	if err != nil{
 		w.WriteHeader(http.StatusInternalServerError)
 		error := Error{Message: err.Error()}
@@ -55,4 +56,40 @@ func (userHandler *CategoryHandler)CreateUser(w http.ResponseWriter, r *http.Req
 		return 
 	}
 	w.WriteHeader(http.StatusCreated)
+}
+
+func (ch *CategoryHandler)GetCategory(w http.ResponseWriter, r *http.Request){
+	w.Header().Set("Content-Type", "application/json")
+
+	categoryId := chi.URLParam(r,"id")
+
+	if categoryId=="" {
+		w.WriteHeader(http.StatusBadRequest)
+		return 
+	}
+
+	category, err := ch.categoryDB.GetCategory(context.Background(), categoryId)
+	if err != nil{
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		return 
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(category)
+}
+
+
+func(ch *CategoryHandler) GetCategories( w http.ResponseWriter, r *http.Request){
+	w.Header().Set("Content-Type", "application/json")
+
+	categories, err := ch.categoryDB.ListCategories(context.Background())
+	if err != nil{
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(err.Error())
+		return 
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(categories)
 }
