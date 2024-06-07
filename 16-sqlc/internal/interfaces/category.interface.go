@@ -13,3 +13,8 @@ type CategoryInterface interface {
 	ListCategories(ctx context.Context) ([]db.Category, error)
 	DeleteCategory(ctx context.Context, id string) error
 }
+
+type CourseInterface interface {
+	CreateCourseAndCategory(ctx context.Context, argsCategory db.CategoryParams, argsCourse db.CourseParams) error
+	ListCourses(ctx context.Context) ([]db.ListCoursesRow, error) 
+}
