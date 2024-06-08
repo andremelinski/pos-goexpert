@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"database/sql"
+	"fmt"
 )
 
 type CourseParams struct {
@@ -58,4 +59,17 @@ func (c *CourseDB) CreateCourseAndCategory(ctx context.Context, argsCategory Cat
 		return err
 	}
 	return nil
+}
+
+func (c *CourseDB) ListCourses(ctx context.Context) ([]ListCoursesRow, error) {
+	courses, err := c.Queries.ListCourses(ctx)
+	if err != nil {
+		return nil, err
+	}
+	for _, course := range courses {
+		fmt.Printf("Category: %s, Course ID: %s, Course Name: %s, Course Description: %s, Course Price: %f",
+			course.CategoryName, course.ID, course.Name, course.Description.String, course.Price)
+	}
+
+	return courses, nil
 }

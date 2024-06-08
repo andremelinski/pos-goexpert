@@ -22,6 +22,7 @@ func (t *Transaction)callTx(ctx context.Context, fn func(*Queries) error) error 
 		return err
 	}
 	q := New(tx)
+	// executa a funcao anonima
 	err = fn(q)
 	if err != nil {
 		if errRb := tx.Rollback(); errRb != nil {

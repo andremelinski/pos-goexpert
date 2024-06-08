@@ -6,8 +6,7 @@ type CreateCategoryInput struct{
 }
 
 type CreateCourseInput struct {
-	Name        string    `json:"name"`
-	// ,omitempty
-	Description string   `json:"description"`
-	Price float64   `json:"price"`
+	Name        string    `json:"course_name"`
+	Description string   `json:"course_description"`
+	Price float64   `json:"price,omitempty"`
 }
