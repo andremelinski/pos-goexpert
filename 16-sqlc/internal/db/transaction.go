@@ -21,8 +21,10 @@ func (t *Transaction)callTx(ctx context.Context, fn func(*Queries) error) error 
 	if err != nil {
 		return err
 	}
+	// iniciou um novo *Queries (onde possui todos os metodos) injentando uma transacao. ou seja, agr o que ocorrer aqui eh dentro da transaction
 	q := New(tx)
-	// executa a funcao anonima
+
+	// executa a funcao anonima vinda de q (que nao as queries que serao executadas que utilizam transaction)
 	err = fn(q)
 	if err != nil {
 		if errRb := tx.Rollback(); errRb != nil {
