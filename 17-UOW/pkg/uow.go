@@ -3,101 +3,97 @@ package pkg
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 )
 
 // toda vez que queremos usar transacao usa o *sql.Tx.
 // Ele deve retornar o repo conectado a transaction. Como nao sabemos o type do repo, voltamos interface{} que eh do tipo any
-type RepositoryFactoryInterface func(tx *sql.Tx) interface{}
+type RepositoryFactory func(tx *sql.Tx) interface{}
 
 type UowInterface interface {
-	Register(name string, fc RepositoryFactoryInterface)
+	Register(name string, fc RepositoryFactory)
 	GetRepository(ctx context.Context, name string) (interface{}, error)
-	// funcao eh a funcao que faz tudo ser executado
-	Do(ctx context.Context, fn func(uow *UOW) error) error
-	CommitOrRollBack() error
+	Do(ctx context.Context, fn func(uow *Uow) error) error
+	CommitOrRollback() error
 	Rollback() error
-	Unregister(name string) error
+	UnRegister(name string)
 }
 
-type UOW struct {
+type Uow struct {
 	Db           *sql.DB
 	Tx           *sql.Tx
-	Repositories map[string]RepositoryFactoryInterface
+	Repositories map[string]RepositoryFactory
 }
 
-// Rollback implements UowInterface.
-func (u *UOW) Rollback() error {
-	panic("unimplemented")
-}
-
-// Unregister implements UowInterface.
-func (u *UOW) Unregister(name string) error {
-	panic("unimplemented")
-}
-
-func NewUOW(ctx context.Context, db *sql.DB) *UOW {
-	return &UOW{
+func NewUow(ctx context.Context, db *sql.DB) *Uow {
+	return &Uow{
 		Db:           db,
-		Repositories: make(map[string]RepositoryFactoryInterface),
+		Repositories: make(map[string]RepositoryFactory),
 	}
 }
 
-func (u *UOW) Register(name string, fc RepositoryFactoryInterface) {
-	// {"nome do repo" : funcao que retorna o Repo que sera usada no tx}
+func (u *Uow) Register(name string, fc RepositoryFactory) {
 	u.Repositories[name] = fc
 }
 
-func (u *UOW) UnRegister(name string) {
+func (u *Uow) UnRegister(name string) {
 	delete(u.Repositories, name)
 }
 
-func (u *UOW) Do(ctx context.Context, fn func(uow *UOW) error) error {
+func (u *Uow) GetRepository(ctx context.Context, name string) (interface{}, error) {
+	if u.Tx == nil {
+		tx, err := u.Db.BeginTx(ctx, nil)
+		if err != nil {
+			return nil, err
+		}
+		u.Tx = tx
+	}
+	repo := u.Repositories[name](u.Tx)
+	return repo, nil
+}
+
+func (u *Uow) Do(ctx context.Context, fn func(Uow *Uow) error) error {
 	if u.Tx != nil {
 		return fmt.Errorf("transaction already started")
 	}
-
 	tx, err := u.Db.BeginTx(ctx, nil)
 	if err != nil {
 		return err
 	}
-
 	u.Tx = tx
-	// agora fica a cargo dos repos de chamarem db.New() que utiliza tudo o que tem no struct UOW
 	err = fn(u)
 	if err != nil {
-		if errRb := tx.Rollback(); errRb != nil {
-			return fmt.Errorf("error on rollback: %v, original error: %w", errRb, err)
+		errRb := u.Rollback()
+		if errRb != nil {
+			return errors.New(fmt.Sprintf("original error: %s, rollback error: %s", err.Error(), errRb.Error()))
 		}
 		return err
 	}
-
-	return u.CommitOrRollBack()
+	return u.CommitOrRollback()
 }
 
-func (u *UOW) CommitOrRollBack() error {
-	err := u.Tx.Commit()
+func (u *Uow) Rollback() error {
+	if u.Tx == nil {
+		return errors.New("no transaction to rollback")
+	}
+	err := u.Tx.Rollback()
 	if err != nil {
-		if errRb := u.Tx.Rollback(); errRb != nil {
-			return fmt.Errorf("error on rollback: %v, original error: %w", errRb, err)
-		}
 		return err
 	}
+	u.Tx = nil
 	return nil
 }
 
-func (u *UOW) GetRepository(ctx context.Context, name string) (interface{}, error) {
-	// se eu pegar o repo mas tx ainda nao foi inicializada, inicia aqui. Pq? pq as vezes vc nao quer utilizar o Do(), as  vezes vc soh quer pegar o repo e fazer algo
-	if u.Tx == nil {
-		tx, err := u.Db.BeginTx(ctx, nil)
-
-		if err != nil {
-			return nil, err
+func (u *Uow) CommitOrRollback() error {
+	err := u.Tx.Commit()
+	if err != nil {
+		errRb := u.Rollback()
+		if errRb != nil {
+			return errors.New(fmt.Sprintf("original error: %s, rollback error: %s", err.Error(), errRb.Error()))
 		}
-
-		u.Tx = tx
+		return err
 	}
-	repo := u.Repositories[name](u.Tx)
-
-	return repo, nil
+	u.Tx = nil
+	return nil
 }

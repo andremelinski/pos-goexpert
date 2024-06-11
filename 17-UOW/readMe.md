@@ -21,3 +21,5 @@ DO( func(uow uow)error ) error{
 ```
 
 https://www.linkedin.com/pulse/what-repository-pattern-alper-sara%C3%A7/
+
+https://go.dev/doc/database/execute-transactions
