@@ -19,3 +19,5 @@ DO( func(uow uow)error ) error{
 -   COMMIT / ROLLBACK
 }
 ```
+
+https://www.linkedin.com/pulse/what-repository-pattern-alper-sara%C3%A7/
