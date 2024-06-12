@@ -2,8 +2,8 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 
-	"github.com/andremelinski/pos-goexpert/18-DI/product"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -15,15 +15,17 @@ func main(){
 		panic(err)
 	}
 
-	// injeta db no repo
-	productRepo := product.NewProductRepository(db)
-	// injeta repo no usecase
-	usecase := product.NewProductUseCase(productRepo)
+	// // injeta db no repo
+	// productRepo := product.NewProductRepository(db)
+	// // injeta repo no usecase
+	// usecase := product.NewProductUseCase(productRepo)
+
+	usecase := NewUseCase(db)
 
 
 	product, err := usecase.GetProduct(1)
 	if err != nil {
 		panic(err)
 	}
-	println(product)
+	fmt.Println(product)
 }

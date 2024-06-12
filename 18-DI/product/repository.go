@@ -4,16 +4,21 @@ import (
 	"database/sql"
 )
 
+type IProductRepository interface{
+	 GetProduct(id int) (*Product, error)
+}
+
 type ProductRepository struct {
 	db *sql.DB
 }
 
-func NewProductRepository(db *sql.DB) *ProductRepository{
-	return &ProductRepository{
-		db,
-	}
+func NewProductRepository(db *sql.DB) *ProductRepository {
+	return &ProductRepository{db}
 }
 
-func (pr *ProductRepository) GetProductId(id int) (Product, error){
-	return Product{ID: id, Name: "name"}, nil
+func (r *ProductRepository) GetProduct(id int) (*Product, error) {
+	return &Product{
+		ID:   id,
+		Name: "Product Name",
+	}, nil
 }

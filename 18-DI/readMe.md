@@ -3,6 +3,7 @@ go install github.com/google/wire/cmd/wire@latest
 export PATH="~/go/bin:$PATH"
 touch wire.go
 wire
+go run main.go wire_gen.go
 ```
 
 ```
