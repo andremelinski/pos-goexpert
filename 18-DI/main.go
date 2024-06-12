@@ -4,6 +4,7 @@ import (
 	"database/sql"
 
 	"github.com/andremelinski/pos-goexpert/18-DI/product"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 // ingestao de dependencias. DI -> um facilitador que resolve esse encadeamento de dependencia, fazendo com que possa ser chamado o usecase diretamente ser configurar manualmente todas essas dependencias
