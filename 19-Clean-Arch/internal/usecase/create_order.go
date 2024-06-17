@@ -17,6 +17,7 @@ type OrderOutputDTO struct {
 	FinalPrice float64 `json:"final_price"`
 }
 
+//  aqui eh toda a parte do mundo externo + regra de negocio
 type CreateOrderUseCase struct {
 	OrderRepository entity.OrderRepositoryInterface // capaz de criar uma ordem no banco de dados
 	OrderCreated    events.EventInterface // evento 
