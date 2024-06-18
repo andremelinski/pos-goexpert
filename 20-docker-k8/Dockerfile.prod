@@ -1,0 +1,17 @@
+FROM golang:latest as builder
+
+WORKDIR /app
+
+COPY . . 
+
+# RUN go build .
+# RUN GOOS=linux go build .
+# RUN go build -o server .
+#  DWARF - debugging with arbitrary record format -> build com coisa pra debug o q deixa pesado
+# RUN go build -ldflags="-w -s" -o server .
+# CGO -> "compilador do C pro go". Desabilitar essa flag significa que nao vamos utilizar nada de C pro build
+RUN GOOS=linux CGO_ENABLED=0 go build -ldflags="-w -s" -o server .
+
+FROM scratch
+COPY --from=builder /app/server .
+CMD ["./server"]

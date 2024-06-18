@@ -1,6 +1,7 @@
 package events
 
 import (
+	"fmt"
 	"sync"
 	"testing"
 	"time"
@@ -69,6 +70,7 @@ func (suite *EventDispatcherSuiteTest) TestEventDispatcher_Register(){
 
 // aplicando EventDispatcherInterface
 func (suite *EventDispatcherSuiteTest) TestEventDispatcher_Register_WithSameHandler(){
+	fmt.Println(suite.event.GetName())
 	err := suite.eventDispatcher.Register(suite.event.GetName(), &suite.handler)
 	assert.NoError(suite.T(), err)
 	suite.Equal(1, len(suite.eventDispatcher.handlers[suite.event.GetName()]))

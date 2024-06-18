@@ -2,6 +2,7 @@ package events
 
 import (
 	"errors"
+	"fmt"
 	"sync"
 )
 
@@ -26,15 +27,20 @@ func NewEventDispatcher() *EventDispatcher{
 func (ed *EventDispatcher) Register(eventName string, handler EventHandlerInterface) error {
 	// nome do evento ja existe
 	//handler e h  possuem valores = &{11111111}. Compara se os objetos com a info TestEventHandler sao iguais
-	// se nao for, adiciona no arr e fica: [0xc000110d00]
+	// se nao for, adiciona no arr e fica: [0xc000110d00], 
+	// se nao, fica:&{map[eventName:[0xc00009f200 0xc00009f208]]} ou &{map[eventName:[0xc000119200] eventName2:[0xc000119208]]}
+	
 	if eventHandlerInterfaceArr, ok := ed.handlers[eventName]; ok {
+		fmt.Println(eventHandlerInterfaceArr)
 		for _, h := range eventHandlerInterfaceArr {
+			fmt.Println(h)
 			if h == handler {
 				return errors.New("handlers already registered")
 			}
 		}
 	}
 	ed.handlers[eventName] = append(ed.handlers[eventName], handler)
+	// fmt.Println(ed)
 
 	return nil
 }
