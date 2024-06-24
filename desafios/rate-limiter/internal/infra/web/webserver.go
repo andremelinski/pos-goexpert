@@ -35,6 +35,11 @@ func NewWebServer(
 func (s *WebServer) Start() {
 	s.Router.Use(middleware.Logger)
 
+	for _, middleware := range s.Middlewares {
+		// intercepta todas as requisicoes e injeta limiter
+		s.Router.Use(middleware.Handler)
+	}
+
 	for _, handler := range s.Handlers {
 		s.Router.MethodFunc(handler.Method, handler.Path, handler.HandlerFunc)
 	}

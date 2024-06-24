@@ -17,19 +17,19 @@ type Middleware struct {
 	Handler func(next http.Handler) http.Handler
 }
 
-// struct recebe a interface que possui os endpoints desse usecase
+// struct recebe a interface que possui os endpoints desse usecase + middlewares
 type WebRouter struct {
 	HelloWebHandler       interfaces.HelloWebHandlerInterface
-	// RateLimiterMiddleware middlewares.RateLimiterMiddlewareInterface
+	Middlewares interfaces.MiddlewareInterface
 }
 
 func NewWebRouter(
 	helloWebHandler interfaces.HelloWebHandlerInterface,
-	// rateLimiterMiddleware middlewares.RateLimiterMiddlewareInterface,
+	middlewares interfaces.MiddlewareInterface,
 ) *WebRouter {
 	return &WebRouter{
-		       helloWebHandler,
-		// RateLimiterMiddleware: rateLimiterMiddleware,
+		helloWebHandler,
+		middlewares,
 	}
 }
 
@@ -45,6 +45,11 @@ func (s *WebRouter) BuildHandlers() []RouteHandler {
 	}
 }
 
-// func (s *WebServer) AddMiddleware(middleware Middleware) {
-// 	s.Middlewares = append(s.Middlewares, middleware)
-// }
+func (s *WebRouter) BuilMiddlewares() []Middleware{
+		return []Middleware{
+		{
+			Name: "rateLimiter",
+			Handler: s.Middlewares.RateLimiter,
+		},
+	}
+}
