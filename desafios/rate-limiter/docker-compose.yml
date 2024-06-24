@@ -1,0 +1,12 @@
+version: '3.7'
+
+services:
+    mysql:
+        image: redis:latest
+        container_name: redis
+        restart: always
+        # platform: linux/amd64
+        # environment:
+        #     password: root
+        ports:
+            - 6379:6379
