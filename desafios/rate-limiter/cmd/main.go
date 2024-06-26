@@ -9,6 +9,7 @@ import (
 	"github.com/andremelinski/pos-goexpert/desafios/rate-limiter/internal/infra/web/webserver/handlers"
 	http_response "github.com/andremelinski/pos-goexpert/desafios/rate-limiter/internal/infra/web/webserver/http"
 	"github.com/andremelinski/pos-goexpert/desafios/rate-limiter/internal/infra/web/webserver/middleware"
+	"github.com/andremelinski/pos-goexpert/desafios/rate-limiter/internal/infra/web/webserver/middleware/strategy"
 )
 
 func main(){
@@ -30,12 +31,14 @@ func main(){
 
 	// --- MIDDLEWARE ---
 	rateLimitConfig := middleware.RateLimiterConfig{
-		Redis: client,
 		MaxRequestsPerIP: configs.IPMaxRequests,
 		MaxRequestsPerToken: configs.TokenMaxRequests,
 		TimeWindowMilliseconds: configs.TimeWindowMilliseconds,
 	}
-	mid := middleware.NewRateLimiterMiddleware(rateLimitConfig, httpResp)
+
+	// layer com conexao com o banco e regra do rate limit
+	strategy := strategy.NewStrategyRateLimit(client)
+	mid := middleware.NewRateLimiterMiddleware(rateLimitConfig, strategy, httpResp)
 
 	// --- HANDLER ---
 	helloWebHandler := handlers.NewHelloWebHandler(httpResp)
