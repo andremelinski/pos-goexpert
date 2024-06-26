@@ -11,7 +11,7 @@ type conf struct {
 	WebServerPort     int `mapstructure:"WEB_SERVER_PORT"`
 	IPMaxRequests	int `mapstructure:"ID_MAX_REQUEST"`
 	TokenMaxRequests	int `mapstructure:"TOKEN_MAX_REQUEST"`
-	TimeWindowMilliseconds int `mapstructure:"TIME_WINDOW_MS"`
+	OperatingWindowMs int `mapstructure:"TIME_WINDOW_MS"`
 }
 
 func LoadConfig(path string) (*conf, error) {

@@ -1,7 +1,6 @@
 package strategy
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -11,9 +10,8 @@ import (
 )
 
 type StrategyInterface interface{
-	RateLimitStrategy( ctx context.Context, input *RateLimitInput) (*RateLimiterOutput, error)
+	RateLimitStrategy(input *RateLimitInput) (*RateLimitOutput, error)
 }
-
 
 type RateLimitInput struct {
 	Key            string
@@ -21,7 +19,7 @@ type RateLimitInput struct {
 	Duration time.Duration
 }
 
-type RateLimiterOutput struct {
+type RateLimitOutput struct {
 	Result    bool
 	Limit     int64
 	Total     int64
@@ -39,8 +37,7 @@ redis,
 	}
 }
 
-func (strl *StrategyRateLimit)RateLimitStrategy( ctx context.Context, input *RateLimitInput) (*RateLimiterOutput, error) {
-
+func (strl *StrategyRateLimit)RateLimitStrategy(input *RateLimitInput) (*RateLimitOutput, error) {
 	result, err := strl.getInfo(input.Key)
 	if err != nil {
 		if errors.Is(err, redis.Nil) {
@@ -73,8 +70,8 @@ func (strl *StrategyRateLimit)RateLimitStrategy( ctx context.Context, input *Rat
 	return strl.getInfo(input.Key)
 }
 
-func(strl *StrategyRateLimit) getInfo(key string) (*RateLimiterOutput ,error){
-	rtInfo := &RateLimiterOutput{}
+func(strl *StrategyRateLimit) getInfo(key string) (*RateLimitOutput ,error){
+	rtInfo := &RateLimitOutput{}
 	result, err := strl.Redis.Get(key).Result()
 	if err != nil{
 		return nil, err
@@ -85,7 +82,7 @@ func(strl *StrategyRateLimit) getInfo(key string) (*RateLimiterOutput ,error){
 }
 
 func(strl *StrategyRateLimit) create(input *RateLimitInput) {
-		obj, _ := json.Marshal(RateLimiterOutput{
+		obj, _ := json.Marshal(RateLimitOutput{
 		Result: true,
 		Limit: input.Limit,
 		Total: input.Limit,
@@ -95,8 +92,8 @@ func(strl *StrategyRateLimit) create(input *RateLimitInput) {
 	strl.Redis.Set(input.Key, obj,  input.Duration)
 }
 
-func(strl *StrategyRateLimit) update(key string, input *RateLimiterOutput, result bool) {
-		obj, _ := json.Marshal(RateLimiterOutput{
+func(strl *StrategyRateLimit) update(key string, input *RateLimitOutput, result bool) {
+		obj, _ := json.Marshal(RateLimitOutput{
 		Result: result,
 		Limit: input.Limit,
 		Total: input.Total -1,

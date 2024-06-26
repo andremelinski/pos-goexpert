@@ -48,8 +48,8 @@ func (s *WebRouter) BuildHandlers() []RouteHandler {
 func (s *WebRouter) BuilMiddlewares() []Middleware{
 		return []Middleware{
 		{
-			Name: "rateLimiter",
-			Handler: s.Middlewares.RateLimiter,
+			Name: "rateLimit",
+			Handler: s.Middlewares.RateLimit,
 		},
 	}
 }

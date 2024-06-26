@@ -30,15 +30,15 @@ func main(){
 	httpResp := http_response.NewWebResponseHandler()
 
 	// --- MIDDLEWARE ---
-	rateLimitConfig := middleware.RateLimiterConfig{
-		MaxRequestsPerIP: configs.IPMaxRequests,
-		MaxRequestsPerToken: configs.TokenMaxRequests,
-		TimeWindowMilliseconds: configs.TimeWindowMilliseconds,
+	rateLimitConfig := middleware.RateLimitConfig{
+		MaxReqIP: configs.IPMaxRequests,
+		MaxReqToken: configs.TokenMaxRequests,
+		OperatingWindowMs: configs.OperatingWindowMs,
 	}
 
 	// layer com conexao com o banco e regra do rate limit
 	strategy := strategy.NewStrategyRateLimit(client)
-	mid := middleware.NewRateLimiterMiddleware(rateLimitConfig, strategy, httpResp)
+	mid := middleware.NewRateLimitMiddleware(rateLimitConfig, strategy, httpResp)
 
 	// --- HANDLER ---
 	helloWebHandler := handlers.NewHelloWebHandler(httpResp)
