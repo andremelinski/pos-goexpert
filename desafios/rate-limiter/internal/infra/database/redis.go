@@ -41,5 +41,4 @@ func(r *Redis) connectDB() *redis.Client{
 		Password: "", // r.dbPassword
 		DB: r.dbName, // 0
     })
-    
 }

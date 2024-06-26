@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/andremelinski/pos-goexpert/desafios/rate-limiter/internal/infra/database"
 	interfaces "github.com/andremelinski/pos-goexpert/desafios/rate-limiter/internal/infra/web/webserver/interface"
 	"github.com/andremelinski/pos-goexpert/desafios/rate-limiter/internal/infra/web/webserver/middleware/strategy"
 	rip "github.com/vikram1565/request-ip"
@@ -50,7 +51,7 @@ func(rlm *RateLimitMiddleware)RateLimit(next http.Handler) http.Handler{
 	})
 }
 
-func(rlm *RateLimitMiddleware) check(apiKey, userIp string) (*strategy.RateLimitOutput, error) {
+func(rlm *RateLimitMiddleware) check(apiKey, userIp string) (*database.RateLimitOutput, error) {
 	var key string
 	var limit int64
 	duration := time.Duration(rlm.rateLimitConfig.OperatingWindowMs) * time.Millisecond
@@ -63,7 +64,7 @@ func(rlm *RateLimitMiddleware) check(apiKey, userIp string) (*strategy.RateLimit
 		limit = int64(rlm.rateLimitConfig.MaxReqIP)
 	}
 
-	strategyInput := &strategy.RateLimitInput{
+	strategyInput := &database.RateLimitInput{
 		Key:      key,
 		Limit:    limit,
 		Duration: duration,

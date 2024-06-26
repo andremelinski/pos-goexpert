@@ -37,7 +37,8 @@ func main(){
 	}
 
 	// layer com conexao com o banco e regra do rate limit
-	strategy := strategy.NewStrategyRateLimit(client)
+	rateLimitRepo := database.NewRateLimitRepository(client)
+	strategy := strategy.NewStrategyRateLimit(rateLimitRepo)
 	mid := middleware.NewRateLimitMiddleware(rateLimitConfig, strategy, httpResp)
 
 	// --- HANDLER ---
