@@ -45,5 +45,5 @@ func TestSuite(t *testing.T) {
 	suite.Run(t, new(MiddlewareRateLimitTestSuite))
 }
 
-func (suite *MiddlewareRateLimitTestSuite)Test_Rate_Limit(){
-}
+// func (suite *MiddlewareRateLimitTestSuite)Test_Rate_Limit(){
+// }
