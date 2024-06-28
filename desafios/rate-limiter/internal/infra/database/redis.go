@@ -37,9 +37,8 @@ func(r *Redis) Client() *redis.Client{
  
 func(r *Redis) connectDB() *redis.Client{
 	return redis.NewClient(&redis.Options{
-		// Addr: fmt.Sprintf("%s:%v", r.dbHost, r.dbPort), //"localhost:6379"
-		Addr: "localhost:6379", //"localhost:6379"
+		Addr: fmt.Sprintf("%s:%v", r.dbHost, r.dbPort), //"localhost:6379"
 		Password: "", // r.dbPassword
-		DB: 0, // 0
+		DB: r.dbName, // 0
     })
 }

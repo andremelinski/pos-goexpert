@@ -10,20 +10,27 @@ services:
             dockerfile: Dockerfile
         ports:
             - 8080:8080
+        environment:
+            - DB_HOST=redis
+            - DB_PORT=6379
         networks:
             - default
         depends_on:
             - redis
+
     redis:
         container_name: redis
         image: redis:latest
         restart: always
+        env_file:
+            - ./.env
         ports:
             - 6379:6379
         volumes:
             - redis-data:/data
         networks:
             - default
+
 volumes:
     redis-data:
 
