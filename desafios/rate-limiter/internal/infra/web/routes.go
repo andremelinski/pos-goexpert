@@ -19,16 +19,16 @@ type Middleware struct {
 
 // struct recebe a interface que possui os endpoints desse usecase + middlewares
 type WebRouter struct {
-	HelloWebHandler       interfaces.HelloWebHandlerInterface
+	HelloWebHandler       interfaces.WebHandlerInterface
 	Middlewares interfaces.MiddlewareInterface
 }
 
 func NewWebRouter(
-	helloWebHandler interfaces.HelloWebHandlerInterface,
+	handlers interfaces.WebHandlerInterface,
 	middlewares interfaces.MiddlewareInterface,
 ) *WebRouter {
 	return &WebRouter{
-		helloWebHandler,
+		handlers,
 		middlewares,
 	}
 }

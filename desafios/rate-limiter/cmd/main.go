@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/andremelinski/pos-goexpert/desafios/rate-limiter/configs"
@@ -22,6 +23,8 @@ func main(){
 	if err != nil {
 		panic(err)
 	}
+
+	fmt.Println(configs)
 
 	client := database.NewRedisClient(configs.DBHost, configs.DBPort, configs.DBPassword, dBName).Client()
 
@@ -46,7 +49,6 @@ func main(){
 	helloWebHandler := handlers.NewHelloWebHandler(httpResp, helloUseCase)
 
 	// --- WEB SERVER ---
-	// injeto todos os handler que a interface HelloWebHandlerInterface usa para a montagem de metodos (post, get, etc)
 	webRouter := web.NewWebRouter(helloWebHandler, mid)
 
 	webServer := web.NewWebServer(

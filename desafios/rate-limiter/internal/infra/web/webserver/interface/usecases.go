@@ -6,7 +6,7 @@ import (
 	"github.com/andremelinski/pos-goexpert/desafios/rate-limiter/internal/usecase"
 )
 
-type HelloWebHandlerInterface interface {
+type WebHandlerInterface interface {
 	Hello(w http.ResponseWriter, r *http.Request)
 }
 
