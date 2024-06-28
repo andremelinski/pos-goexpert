@@ -12,8 +12,8 @@ func NewHelloUseCase(
 	return &HelloUseCase{}
 }
 
-func(h *HelloUseCase) Hello() HelloOuputDTO{
-	return HelloOuputDTO{
+func(h *HelloUseCase) Hello() *HelloOuputDTO{
+	return &HelloOuputDTO{
 		"hello",
 	}
 }

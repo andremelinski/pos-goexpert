@@ -7,9 +7,9 @@ import (
 	"github.com/andremelinski/pos-goexpert/desafios/rate-limiter/internal/infra/database"
 	"github.com/andremelinski/pos-goexpert/desafios/rate-limiter/internal/infra/web"
 	"github.com/andremelinski/pos-goexpert/desafios/rate-limiter/internal/infra/web/webserver/handlers"
-	http_response "github.com/andremelinski/pos-goexpert/desafios/rate-limiter/internal/infra/web/webserver/http"
 	"github.com/andremelinski/pos-goexpert/desafios/rate-limiter/internal/infra/web/webserver/middleware"
 	"github.com/andremelinski/pos-goexpert/desafios/rate-limiter/internal/infra/web/webserver/middleware/strategy"
+	"github.com/andremelinski/pos-goexpert/desafios/rate-limiter/internal/usecase"
 )
 
 func main(){
@@ -27,7 +27,7 @@ func main(){
 
 	// aplica WebResponseHandlerInterface -> expoe uma resposta http retornando Respond or RespondWithEror 
 	// msm coisa do TS para erro customizavel e quando quer pegar a interface Error
-	httpResp := http_response.NewWebResponseHandler()
+	httpResp := handlers.NewWebResponseHandler()
 
 	// --- MIDDLEWARE ---
 	rateLimitConfig := middleware.RateLimitConfig{
@@ -42,7 +42,8 @@ func main(){
 	mid := middleware.NewRateLimitMiddleware(rateLimitConfig, strategy, httpResp)
 
 	// --- HANDLER ---
-	helloWebHandler := handlers.NewHelloWebHandler(httpResp)
+	helloUseCase := usecase.NewHelloUseCase()
+	helloWebHandler := handlers.NewHelloWebHandler(httpResp, helloUseCase)
 
 	// --- WEB SERVER ---
 	// injeto todos os handler que a interface HelloWebHandlerInterface usa para a montagem de metodos (post, get, etc)

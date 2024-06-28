@@ -2,7 +2,9 @@ package middleware
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/andremelinski/pos-goexpert/desafios/rate-limiter/internal/infra/database"
@@ -42,6 +44,8 @@ func(rlm *RateLimitMiddleware)RateLimit(next http.Handler) http.Handler{
 			rlm.httpResponse.RespondWithError(w, http.StatusInternalServerError, errors.Join(errors.New("error at RateLimit normalization: "), err))
 			return 
 		}
+		
+		rlm.writeHeaders(w, result)
 
 		if !result.Result {
 			rlm.httpResponse.RespondWithError(w, http.StatusTooManyRequests, errors.New("rate limit exceeded"))
@@ -69,10 +73,16 @@ func(rlm *RateLimitMiddleware) check(apiKey, userIp string) (*database.RateLimit
 		Limit:    limit,
 		Duration: duration,
 	}
-
+	fmt.Println(strategyInput)
 	result, err := rlm.strategy.RateLimitStrategy(strategyInput)
 	if err != nil {
 		return nil, err
 	}
 	return result, nil
+}
+
+func(rlm *RateLimitMiddleware) writeHeaders(w http.ResponseWriter, res *database.RateLimitOutput) {
+	w.Header().Set("X-RateLimit-Limit", strconv.FormatInt(res.Limit, 10))
+	w.Header().Set("X-RateLimit-Total", strconv.FormatInt(res.Total, 10))
+	w.Header().Set("X-RateLimit-Reset", strconv.FormatInt(res.ExpiresAt.Unix(), 10))
 }
