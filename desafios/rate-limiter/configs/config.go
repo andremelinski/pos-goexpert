@@ -3,7 +3,6 @@ package configs
 import "github.com/spf13/viper"
 
 type conf struct {
-	DBDriver          string `mapstructure:"DB_DRIVER"`
 	DBName            string `mapstructure:"DB_NAME"`
 	DBHost            string `mapstructure:"DB_HOST"`
 	DBPort            int `mapstructure:"DB_PORT"`

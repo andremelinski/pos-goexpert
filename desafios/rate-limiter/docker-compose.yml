@@ -9,10 +9,10 @@ services:
             context: .
             dockerfile: Dockerfile
         ports:
-            - 8080:8080
+            - ${WEB_SERVER_PORT}:${WEB_SERVER_PORT}
         environment:
             - DB_HOST=redis
-            - DB_PORT=6379
+            - DB_PORT=${DB_PORT}
         networks:
             - default
         depends_on:
@@ -25,7 +25,7 @@ services:
         env_file:
             - ./.env
         ports:
-            - 6379:6379
+            - ${DB_PORT}:${DB_PORT}
         volumes:
             - redis-data:/data
         networks:
