@@ -4,9 +4,7 @@ Copyright © 2024 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"fmt"
-
-	"github.com/andremelinski/pos-goexpert/desafios/Stress-test/internal/usecases"
+	"github.com/andremelinski/pos-goexpert/desafios/stress-test/internal/usecases"
 	"github.com/spf13/cobra"
 )
 
@@ -22,19 +20,13 @@ func newStressCmd() *cobra.Command{
 
 func runStress(cmd *cobra.Command, args []string) error {
 	url, _ := cmd.Flags().GetString("url")
-	requests, _ := cmd.Flags().GetUint64("requests")
-	concurrency, _ := cmd.Flags().GetUint64("concurrency")
-
-	input := usecases.StressTestInput{
-		URL:         url,
-		Requests:    requests,
-		Concurrency: concurrency,
+	requests, _ := cmd.Flags().GetInt64("request")
+	concurrency, _ := cmd.Flags().GetInt64("concurrency")
+	err := usecases.NewStressURL(url, requests, concurrency).Aqui()
+	if err != nil{
+		return err
 	}
-
-	fmt.Println(input)
-	usecases.Aqui()
-
-
+	cmd.Print("report completed\n")
 	return nil
 }
 
@@ -43,8 +35,7 @@ func init() {
 	rootCmd.AddCommand(createCmd)
 
 	createCmd.Flags().StringP("url", "u", "", "service URL to test")
-	createCmd.Flags().Uint64P("requests","r", 0, "number of requests to perform")
-	createCmd.Flags().Uint64P("concurrency", "c",0, "number of simultaneous requests to make at a time")
-	createCmd.MarkFlagsRequiredTogether("url", "requests", "concurrency")
-	
+	createCmd.Flags().Int64P("request","r", 0, "number of requests to perform")
+	createCmd.Flags().Int64P("concurrency", "c",0, "number of simultaneous requests to make at a time")
+	createCmd.MarkFlagsRequiredTogether("url", "request", "concurrency")
 }

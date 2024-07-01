@@ -2,122 +2,123 @@ package usecases
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 	"sync"
+	"sync/atomic"
+	"time"
 )
 
 
-type StressTestInput struct{
+type StatusCode map[string]int
+
+type HTTPStats struct {
+	Total int64 `json:"total"`
+	StatusCode []StatusCode
+	ExecutionTimeMcs int64 `json:"execution-time-microseconds"`
+}
+type DateStats map[string]HTTPStats
+
+type StressTestURL struct{
 	URL string
-	Requests uint64
-	Concurrency uint64
+	Requests int64
+	Concurrency int64
+	arr []StatusCode
+	mapper map[string]int 
 }
 
-
-
-func NewStressURL(){
+func NewStressURL(url string, req, conc int64) *StressTestURL{
+	 return &StressTestURL{
+		URL: "http://google.com",
+		Requests: req, 
+		Concurrency: conc,
+		arr: []StatusCode{},
+		mapper: map[string]int{},
+	}
 }
 
 var (
 	wg sync.WaitGroup
 ) 
 
-func Aqui(){
-	conc := 2
-	call := 5
-	// controla a quantidade que ocorre em concorrencia
-	// esse channel suporta ate o valor que esta em conc dentro dele
-	errorControlCh := make(chan struct{}, 1)
-	httpResp := make(chan int, conc)
-
-	// for{ 
-	for i := 0; i < call; i++ {
+func(s *StressTestURL) Aqui() error{
+	httpResp := make(chan int64, s.Concurrency)
+	
+	start := time.Now()
+	for i := 0; i < int(s.Requests); i++ {
 		wg.Add(1)
-		go callURL("http://google.com",   errorControlCh, httpResp)
+		go s.callURL(  httpResp)
 	}
+	elapsed := time.Since(start).Microseconds()
 
 	defer wg.Wait()
+	done := make(chan bool)
 
+	i :=int64(0)
 	go func(){
 		for {
 			select{
-			case msg := <- httpResp:
-				// if ok{
-					fmt.Printf("Http status %d\n", msg)
-				// }
-				break
+			case status, _ := <- httpResp:
+				s.groupData(status)
+				atomic.AddInt64(&i, 1)
+				if i == s.Requests {
+					done <- true
+					return
+				}
 			}
 		}
 	}()
-	writeFile()
+	<- done
+	return s.writeFile(elapsed)
 }
 
-// func retryErrorFileUpload(errorFileUpload chan struct{}){
-// 	for{
-// 		select {
-// 		case fileName, ok := <- errorFileUpload:
-// 			if ok {
-// 				wg.Add(1)
-// 				// para retentar, deve sinalizar 
-// 				uploadControl <- struct{}{}
-			
-// 				go callURL( fileName,  "s3-sqs-ts-bucket-dev-321123", uploadControl, errorFileUpload)
-// 			}
-// 		}
-// 	}
-// }
-
-
-func callURL(url string, errorControlCh chan struct{}, httpCh chan int){
-	resp, err := 	http.DefaultClient.Get(url)
-
+func(s *StressTestURL) callURL( httpCh chan int64){
+	resp, err := 	http.DefaultClient.Get(s.URL)
 	if err != nil {
-		// <-errorControlCh
 		fmt.Println(err)
 	}
-		// fmt.Println(resp)
-	// fmt.Println(resp.StatusCode)
-	httpCh <- resp.StatusCode
-	
+	httpCh <- int64(resp.StatusCode)
 	defer wg.Done()
 }
 
-type HTTPStats struct {
-	Total int `json:"total"`
-	Code200 int `json:"200,omitempty"`
-	Code400 int `json:"400,omitempty"`
-	Code500 int `json:"500,omitempty"`
-	Time int `json:"time"`
-}
-type DateStats map[string]map[string]HTTPStats
 
-func writeFile(){
+func(s *StressTestURL) groupData(status int64){
+	strStatus := strconv.FormatInt(status, 10)
+	// s.mapper[strStatus] ==0 ocorre para um novo item no mapper e na 1 insercao. Erro: [{200:0}, {200:1}]
+	if s.mapper[strStatus] ==0 {
+		// cria uma posicao a frente para nao duplicar
+		s.mapper[strStatus] = len(s.arr)+1
+		statusCode:= StatusCode{
+				strStatus: 1,
+			}
+			s.arr = append(s.arr, statusCode)
+	}else{
+		statusCodeIndexArr := s.mapper[strStatus]-1
+		s.arr[statusCodeIndexArr][strStatus]++
+	}
+}
+
+
+func(s *StressTestURL) writeFile(executionTime int64) error {
   // Open the JSON file
     file, err := os.OpenFile("data.txt", os.O_APPEND|os.O_CREATE | os.O_WRONLY, 0644)
     if err != nil {
-        fmt.Println("Error opening file:", err)
-        return
+        return errors.Join(errors.New("Error opening file:"), err)
     }
     defer file.Close()
 
 	newStats := HTTPStats{
-		Total: 15,
-		Code200: 3,
-		Time: 3000,
+		Total: s.Requests,
+		StatusCode: s.arr,
+		ExecutionTimeMcs: executionTime,
 	}
 
-	data :=  DateStats{
-		"30-06-2024": {
-			"http://example.com": newStats,
-		},
-	}
-
-	updatedJsonData, err := json.MarshalIndent(data, "", "  ")
+	updatedJsonData, err := json.MarshalIndent(newStats, "", "  ")
 	if err != nil {
-		fmt.Println("Error encoding JSON:", err)
-		return
+		return errors.Join(errors.New("Error encoding JSON:"), err)
 	}
 
 	str := string(updatedJsonData)+",\n"
@@ -125,7 +126,7 @@ func writeFile(){
 	_, err = file.Write([]byte(str))
 	
 	if err != nil {
-		fmt.Println("Error encoding JSON:", err)
-		return
+		return errors.Join(errors.New("Error writing into file:"), err)
 	}
+	return nil
 }
