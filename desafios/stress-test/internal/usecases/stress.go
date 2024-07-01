@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"strconv"
@@ -16,6 +17,7 @@ import (
 type StatusCode map[string]int
 
 type HTTPStats struct {
+	URL string `json:"url"`
 	Total int64 `json:"total"`
 	StatusCode []StatusCode
 	ExecutionTimeMcs int64 `json:"execution-time-microseconds"`
@@ -32,7 +34,7 @@ type StressTestURL struct{
 
 func NewStressURL(url string, req, conc int64) *StressTestURL{
 	 return &StressTestURL{
-		URL: "http://google.com",
+		URL: url,
 		Requests: req, 
 		Concurrency: conc,
 		arr: []StatusCode{},
@@ -44,7 +46,7 @@ var (
 	wg sync.WaitGroup
 ) 
 
-func(s *StressTestURL) Aqui() error{
+func(s *StressTestURL) Stress() (*string, error){
 	httpResp := make(chan int64, s.Concurrency)
 	
 	start := time.Now()
@@ -72,7 +74,8 @@ func(s *StressTestURL) Aqui() error{
 		}
 	}()
 	<- done
-	return s.writeFile(elapsed)
+	s.writeFile(elapsed)
+	return s.readFile()
 }
 
 func(s *StressTestURL) callURL( httpCh chan int64){
@@ -102,7 +105,7 @@ func(s *StressTestURL) groupData(status int64){
 }
 
 
-func(s *StressTestURL) writeFile(executionTime int64) error {
+func(s *StressTestURL) writeFile(executionTime int64)  error {
   // Open the JSON file
     file, err := os.OpenFile("data.txt", os.O_APPEND|os.O_CREATE | os.O_WRONLY, 0644)
     if err != nil {
@@ -111,6 +114,7 @@ func(s *StressTestURL) writeFile(executionTime int64) error {
     defer file.Close()
 
 	newStats := HTTPStats{
+		URL: s.URL,
 		Total: s.Requests,
 		StatusCode: s.arr,
 		ExecutionTimeMcs: executionTime,
@@ -129,4 +133,19 @@ func(s *StressTestURL) writeFile(executionTime int64) error {
 		return errors.Join(errors.New("Error writing into file:"), err)
 	}
 	return nil
+}
+
+func(s *StressTestURL) readFile() (*string, error){
+	  file, err := os.OpenFile("data.txt", os.O_RDONLY, 0644)
+    if err != nil {
+        return nil, err
+    }
+    defer file.Close()
+	byteContent, err := io.ReadAll(file)
+
+	if err != nil {
+        return nil, err
+    }
+	strByte := string(byteContent)
+	return &strByte, err
 }

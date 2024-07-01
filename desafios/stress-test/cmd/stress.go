@@ -22,11 +22,12 @@ func runStress(cmd *cobra.Command, args []string) error {
 	url, _ := cmd.Flags().GetString("url")
 	requests, _ := cmd.Flags().GetInt64("request")
 	concurrency, _ := cmd.Flags().GetInt64("concurrency")
-	err := usecases.NewStressURL(url, requests, concurrency).Aqui()
+	concent, err := usecases.NewStressURL(url, requests, concurrency).Stress()
 	if err != nil{
 		return err
 	}
 	cmd.Print("report completed\n")
+	cmd.Println(*concent)
 	return nil
 }
 
