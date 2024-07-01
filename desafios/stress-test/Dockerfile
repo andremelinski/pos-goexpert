@@ -5,10 +5,10 @@ WORKDIR /app
 
 COPY . . 
 
-
-RUN GOOS=linux CGO_ENABLED=0 go build -ldflags="-w -s" -o bin/api cmd/main.go
+RUN go mod download
+RUN GOOS=linux CGO_ENABLED=0 go build -ldflags="-w -s" -o bin/cli ./main.go
 
 FROM scratch
-COPY --from=builder /app/bin/api .
+COPY --from=builder /app/bin/cli .
 
-CMD ["./api"]
+ENTRYPOINT ["./cli"]

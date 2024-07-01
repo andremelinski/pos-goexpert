@@ -3,7 +3,6 @@ package usecases
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -81,7 +80,7 @@ func(s *StressTestURL) Stress() (*string, error){
 func(s *StressTestURL) callURL( httpCh chan int64){
 	resp, err := 	http.DefaultClient.Get(s.URL)
 	if err != nil {
-		fmt.Println(err)
+		panic(err)
 	}
 	httpCh <- int64(resp.StatusCode)
 	defer wg.Done()
