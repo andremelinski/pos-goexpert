@@ -4,7 +4,7 @@ Copyright © 2024 NAME HERE <EMAIL ADDRESS>
 package main
 
 import (
-	"github.com/andremelinski/15-cobra/cmd"
+	"github.com/andremelinski/pos-goexpert/desafios/Stress-test/cmd"
 )
 
 func main() {

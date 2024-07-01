@@ -22,6 +22,7 @@ to quickly create a Cobra application.`,
 		if command == "ping"{
 			cmd.Print("return ping \n")
 		}else{
+			cmd.Print("command" + "\n")
 			cmd.Print(command + "\n")
 		}
 	},
