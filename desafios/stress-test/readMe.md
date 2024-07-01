@@ -4,18 +4,23 @@ Implementação de uma CLI em Go utilizando Cobra para realizar testes de stress
 
 ## Arquitetura
 
-A aplicação é composta por um servidor web que recebe requisições HTTP e um middleware de rate limiter que é responsável por controlar o número de requisições recebidas. O [middleware](internal/infra/web/webserver/middleware/middleware.go) intercepta todas as requisições e realiza toda a chacagem pelo [strategy](internal/infra/web/webserver/middleware/strategy/rate-limiter.go). Para armazenar os dados é utilizado o Redis por ser um banco de fácil uso e que possui a opção de expiração do dado após um determinado tempo.
-
-O rate limiter é configurável por IP ou token `API_KEY` no arquivo `.env`. Exemplo de configuração para limitar 10 requisições por IP e 100 requisições por token em uma janela de tempo de 5 minutos:
+As requisições HTTP são realizadas utilizando green threads de acordo com o numero colocado na opção de concurrency, sendo seu retorno armazenado em um canal para futuro tratamento do status code de cada chamada como demonstrado na funcao [stress](internal/usecases/stress.go). Ao fazer o pull da informação contida no canal, é realizado o agrupamento de status code em um array e posteriormente escrito um arquivo data.txt. Para obter essas infromações, o arquivo é lido e retornado na cli
 
 ## Executando o projeto
 
-**Obs:** é necessário ter o [Docker](https://www.docker.com/) e [Docker Compose](https://docs.docker.com/compose/) instalados.
+**Obs:** é necessário ter o [Docker](https://www.docker.com/) instalado.
 
-1. Rode o comando
+1. Rode o comando para fazer o pull da imagem no DokcerHub
 
 ```
-docker run melinski/goexpert-stress-test-cli:latest \
+docker pull melinski/goexpert-stress-test-cli:latest
+```
+
+2. Rode comando para testar
+
+```
+docker run melinski/goexpert-stress-test-cli \
+    stress \
     --url https://google.com.br \
     --requests 100 \
     --concurrency 10
@@ -23,12 +28,10 @@ docker run melinski/goexpert-stress-test-cli:latest \
 
 ou utilizando abreviações
 
-<!-- docker tag local-image:tagname new-repo:tagname
-docker push new-repo:tagname -->
-
 ```
-docker run melinski/goexpert-stress-test-cli:latest \
-    -u=https://google.com.br \
+docker run melinski/goexpert-stress-test-cli \
+    stress \
+    -u=http://google.com.br \
     -r=100 \
     -c=10
 ```
