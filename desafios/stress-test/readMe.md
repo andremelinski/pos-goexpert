@@ -21,7 +21,7 @@ docker pull melinski/goexpert-stress-test-cli:latest
 ```
 docker run melinski/goexpert-stress-test-cli \
     stress \
-    --url https://google.com.br \
+    --url http://google.com.br \
     --requests 100 \
     --concurrency 10
 ```
