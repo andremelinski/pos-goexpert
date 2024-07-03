@@ -1,6 +1,8 @@
 package database
 
 import (
+	"fmt"
+	"os"
 	"testing"
 	"time"
 
@@ -70,8 +72,18 @@ func (suite *RateLimitRepositoryTestSuite) Test_UpdateRateLimitInfo() {
 }
 
 func(suite *RateLimitRepositoryTestSuite) connectDBLocally() *redis.Client{
+	host:= "localhost"
+	port:= "6379"
+
+	if os.Getenv("DB_HOST") != "" {
+		host = os.Getenv("DB_HOST")
+	}
+	if os.Getenv("DB_PORT") != "" {
+		port = os.Getenv("DB_PORT")
+	} 
+
 	return redis.NewClient(&redis.Options{
-		Addr: "localhost:6379",
+		Addr: fmt.Sprintf("%s:%s",   host, port),
 		Password: "", 
 		DB: 0, 
     })
