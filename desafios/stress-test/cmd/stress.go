@@ -38,5 +38,5 @@ func init() {
 	createCmd.Flags().StringP("url", "u", "", "service URL to test")
 	createCmd.Flags().Int64P("requests","r", 0, "number of requests to perform")
 	createCmd.Flags().Int64P("concurrency", "c",0, "number of simultaneous requests to make at a time")
-	createCmd.MarkFlagsRequiredTogether("url", "request", "concurrency")
+	createCmd.MarkFlagsRequiredTogether("url", "requests", "concurrency")
 }
