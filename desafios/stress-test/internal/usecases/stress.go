@@ -19,7 +19,7 @@ type HTTPStats struct {
 	URL string `json:"url"`
 	Total int64 `json:"total"`
 	StatusCode []StatusCode
-	ExecutionTimeMcs int64 `json:"execution-time-microseconds"`
+	ExecutionTimeMs int64 `json:"execution-time-miliseconds"`
 }
 type DateStats map[string]HTTPStats
 
@@ -28,7 +28,8 @@ type StressTestURL struct{
 	Requests int64
 	Concurrency int64
 	arr []StatusCode
-	mapper map[string]int 
+	mapper map[string]int
+	ExecutionMs int64
 }
 
 func NewStressURL(url string, req, conc int64) *StressTestURL{
@@ -38,6 +39,7 @@ func NewStressURL(url string, req, conc int64) *StressTestURL{
 		Concurrency: conc,
 		arr: []StatusCode{},
 		mapper: map[string]int{},
+		ExecutionMs: 0,
 	}
 }
 
@@ -45,15 +47,18 @@ var (
 	wg sync.WaitGroup
 ) 
 
+type HttpInfo struct{
+	HTTPStats int64
+	callDuration int64
+}
+
 func(s *StressTestURL) Stress() (*string, error){
-	httpResp := make(chan int64, s.Concurrency)
+	httpResp := make(chan HttpInfo, s.Concurrency)
 	
-	start := time.Now()
 	for i := 0; i < int(s.Requests); i++ {
 		wg.Add(1)
 		go s.callURL(  httpResp)
 	}
-	elapsed := time.Since(start).Microseconds()
 
 	defer wg.Wait()
 	done := make(chan bool)
@@ -65,6 +70,7 @@ func(s *StressTestURL) Stress() (*string, error){
 			case status, _ := <- httpResp:
 				s.groupData(status)
 				atomic.AddInt64(&i, 1)
+				s.ExecutionMs += status.callDuration
 				if i == s.Requests {
 					done <- true
 					return
@@ -73,22 +79,28 @@ func(s *StressTestURL) Stress() (*string, error){
 		}
 	}()
 	<- done
-	s.writeFile(elapsed)
+	s.writeFile()
 	return s.readFile()
 }
 
-func(s *StressTestURL) callURL( httpCh chan int64){
+func(s *StressTestURL) callURL( httpCh chan HttpInfo){
+	start := time.Now()
 	resp, err := 	http.DefaultClient.Get(s.URL)
+	elapsed := time.Since(start).Milliseconds()
 	if err != nil {
 		panic(err)
 	}
-	httpCh <- int64(resp.StatusCode)
+	
+	httpCh <- HttpInfo{
+	int64(resp.StatusCode),
+	elapsed,
+	}
 	defer wg.Done()
 }
 
 
-func(s *StressTestURL) groupData(status int64){
-	strStatus := strconv.FormatInt(status, 10)
+func(s *StressTestURL) groupData(status HttpInfo){
+	strStatus := strconv.FormatInt(status.HTTPStats, 10)
 	// s.mapper[strStatus] ==0 ocorre para um novo item no mapper e na 1 insercao. Erro: [{200:0}, {200:1}]
 	if s.mapper[strStatus] ==0 {
 		// cria uma posicao a frente para nao duplicar
@@ -104,7 +116,7 @@ func(s *StressTestURL) groupData(status int64){
 }
 
 
-func(s *StressTestURL) writeFile(executionTime int64)  error {
+func(s *StressTestURL) writeFile()  error {
   // Open the JSON file
     file, err := os.OpenFile("data.txt", os.O_APPEND|os.O_CREATE | os.O_WRONLY, 0644)
     if err != nil {
@@ -116,7 +128,7 @@ func(s *StressTestURL) writeFile(executionTime int64)  error {
 		URL: s.URL,
 		Total: s.Requests,
 		StatusCode: s.arr,
-		ExecutionTimeMcs: executionTime,
+		ExecutionTimeMs: s.ExecutionMs,
 	}
 
 	updatedJsonData, err := json.MarshalIndent(newStats, "", "  ")
