@@ -3,6 +3,7 @@ package usecases
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -88,6 +89,7 @@ func(s *StressTestURL) callURL( httpCh chan HttpInfo){
 	resp, err := 	http.DefaultClient.Get(s.URL)
 	elapsed := time.Since(start).Milliseconds()
 	if err != nil {
+		fmt.Println(err.Error())
 		panic(err)
 	}
 	
