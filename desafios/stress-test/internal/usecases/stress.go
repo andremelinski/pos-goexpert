@@ -9,7 +9,6 @@ import (
 	"os"
 	"strconv"
 	"sync"
-	"sync/atomic"
 	"time"
 )
 
@@ -55,39 +54,27 @@ type HttpInfo struct{
 
 func(s *StressTestURL) Stress() (*string, error){
 	httpResp := make(chan HttpInfo, s.Concurrency)
-	
+	start := time.Now()
+
 	for i := 0; i < int(s.Requests); i++ {
 		wg.Add(1)
 		go s.callURL(  httpResp)
 	}
 
-	defer wg.Wait()
-	done := make(chan bool)
-
-	i :=int64(0)
 	go func(){
-		for {
-			select{
-			case status, _ := <- httpResp:
-				s.groupData(status)
-				atomic.AddInt64(&i, 1)
-				s.ExecutionMs += status.callDuration
-				if i == s.Requests {
-					done <- true
-					return
-				}
-			}
+		for status := range httpResp {
+			s.groupData(status)
+
 		}
 	}()
-	<- done
+	wg.Wait()
+	s.ExecutionMs = time.Since(start).Abs().Milliseconds()
 	s.writeFile()
 	return s.readFile()
 }
 
 func(s *StressTestURL) callURL( httpCh chan HttpInfo){
-	start := time.Now()
 	resp, err := 	http.DefaultClient.Get(s.URL)
-	elapsed := time.Since(start).Milliseconds()
 	if err != nil {
 		fmt.Println(err.Error())
 		panic(err)
@@ -95,7 +82,7 @@ func(s *StressTestURL) callURL( httpCh chan HttpInfo){
 	
 	httpCh <- HttpInfo{
 	int64(resp.StatusCode),
-	elapsed,
+	11,
 	}
 	defer wg.Done()
 }
