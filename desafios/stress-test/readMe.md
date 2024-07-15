@@ -39,16 +39,22 @@ docker run melinski/goexpert-stress-test-cli \
 -   **Test de Stress:**
 
 ```sh
-$ go run main.go stress -u="http://google.com" -r=5 -c=2
+$ go run main.go stress -u="http://google.com" -r=300 -c=100
 report completed
 {
-  "url": "http://google.com",
-  "total": 5,
+  "url": "http://google.com.br",
+  "total": 300,
   "StatusCode": [
     {
-      "200": 5
+      "200": 14
+    },
+    {
+      "500": 286
+    },
+    {
+      "302": 286
     }
   ],
-  "execution-time-microseconds": 25
+  "execution-time-miliseconds": 23401
 },
 ```

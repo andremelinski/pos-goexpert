@@ -49,7 +49,6 @@ var (
 
 type HttpInfo struct{
 	HTTPStats int64
-	callDuration int64
 }
 
 func(s *StressTestURL) Stress() (*string, error){
@@ -77,12 +76,13 @@ func(s *StressTestURL) callURL( httpCh chan HttpInfo){
 	resp, err := 	http.DefaultClient.Get(s.URL)
 	if err != nil {
 		fmt.Println(err.Error())
-		panic(err)
+		httpCh <- HttpInfo{
+		500,
+		}
 	}
 	
 	httpCh <- HttpInfo{
 	int64(resp.StatusCode),
-	11,
 	}
 	defer wg.Done()
 }
