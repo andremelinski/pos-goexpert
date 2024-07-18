@@ -14,3 +14,16 @@
   ],
   "execution-time-miliseconds": 23401
 },
+{
+  "url": "http://google.com.br",
+  "total": 300,
+  "StatusCode": [
+    {
+      "200": 14
+    },
+    {
+      "500": 5
+    },
+  ],
+  "execution-time-miliseconds": 23401
+},

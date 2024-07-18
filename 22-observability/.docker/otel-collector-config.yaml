@@ -1,0 +1,32 @@
+# como esse dados vao ser recebidos
+receivers:
+    otlp:
+        protocols:
+            grpc:
+# os dados do receivers vao ser enviados para os exporters, no caso o prometheus
+exporters:
+    prometheus:
+        endpoint: '0.0.0.0:8889'
+
+    logging:
+    # export do opentelemetry pro yeagher
+    otlp:
+        endpoint: jaeger-all-in-one:4317
+        tls:
+            insecure: true
+#  como os dados vao ser processados
+processors:
+    # trabalha de forma async. acumula diversos traces e dai envia
+    batch:
+
+# pipelines que tem os receivers e os processeros que a gente config e os exports que sao pra onde essa info deve ser enviada
+service:
+    pipelines:
+        traces:
+            receivers: [otlp]
+            processors: [batch]
+            exporters: [logging, otlp]
+        metrics:
+            receivers: [otlp]
+            processors: [batch]
+            exporters: [logging, prometheus]
