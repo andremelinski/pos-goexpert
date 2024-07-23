@@ -38,9 +38,8 @@ func initProvider(serviceName, collectorURL string) (func(context.Context) error
 
 	ctx, cancel := context.WithTimeout(ctx, time.Second)
 	defer cancel()
-	conn, err := grpc.DialContext(ctx, collectorURL,
+	conn, err := grpc.NewClient( collectorURL,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithBlock(),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create gRPC connection to collector: %w", err)
